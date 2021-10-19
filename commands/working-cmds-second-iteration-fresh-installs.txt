@@ -1,0 +1,31 @@
+  761  ls
+  762  conda create -n jblast python=3
+  763   conda activate jblast
+  764  conda install redis
+  765  npm install -g sails@1.0.2
+  766  which npm
+  767  ls
+  768  ls assets/
+  769  ll assets/
+  770  rm -r assets/
+  771  ls
+  772  rm -r jbconnect/
+  773  rm -rf jbconnect/
+  774  ls
+  775  git clone http://github.com/gmod/jbconnect
+  776  cd jbconnect/
+  777  ls ..
+  778  conda install -c conda-forge nodejs=10.12
+  779  npm install gmod/jblast-jbconnect-hook
+  780  ls
+  781  npm install enuggetry/blast-ncbi-tools enuggetry/faux-blastdb
+  782  ./utils/blast_getBlastUtils.js 2.8.1
+  783  npm install @gmod/jbrowse@1.15.1
+  784  less fix_jbrowse_setup.patch
+  785  patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+  786  ./utils/jb_setup.js
+  787  sails lift
+  788  ls
+  789  history | tail -n 20 | less
+  790  history | tail -n 30 | less
+  791  history | tail -n 31 > ~/working-cmds-second-iteration-fresh-installs.txt 

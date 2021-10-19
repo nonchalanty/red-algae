@@ -1,0 +1,60 @@
+  682  conda install nodejs>=14
+  683  node --version
+  684  which node
+  685  conda install -c condaforge nodejs>=14
+  686  conda install -c conda-forge nodejs>=14
+  687  conda env list
+  688  conda install -c bioconda nodejs>=14
+  689  which nodejs
+  690  which node
+  691  node --version
+  692  conda install -v -c bioconda nodejs>=14
+  693  conda uninstall nodejs
+  694  conda install -c conda-forge nodejs>=14
+  695  conda install -vv -c conda-forge nodejs>=14
+  696  conda uninstall nodejs
+  697  conda install -c conda-forge nodejs">=14"
+  698  which python
+  699  node --version
+  700  conda install -c conda-forge nodejs">=14"
+  701   npm install gmod/jblast-jbconnect-hook
+  702  npm install gmod/jblast-jbconnect-hook
+  703  conda uninstall node
+  704  conda uninstall nodejs
+  705  conda install -c conda-forge nodejs=10.12
+  706  npm install gmod/jblast-jbconnect-hook
+  707  ls
+  708  rm ./\=14 
+  709  ls
+  710  rm dump.rdb 
+  711  rm -r node_modules/
+  712  cd jbconnect/
+  713  git pull
+  714  git stashsh
+  715  git stash
+  716  npm install
+  717  pwd
+  718  npm install enuggetry/blast-ncbi-tools enuggetry/faux-blastdb
+  719  ./utils/blast_getBlastUtils.js 2.8.1
+  720  npm install gmod/jblast-jbconnect-hook
+  721  ls
+  722  npm install @gmod/jbrowse@1.15.1
+  723  less patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+  724  less fix_jbrowse_setup.patch 
+  725  patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+  726  ./utils/jb_setup.js
+  727  history | tail -n 30
+  728  history | tail -n 32 > ~/working-cmds-up-until-the-last.txt
+  729  cpan install ExtUtils::MakeMaker
+  730  yum install ExtUtils::MakeMaker
+  731  perlbrew install ExtUtils::MakeMaker
+  732  sudo yum install perlbrew
+  733  conda install ExtUtils::MakeMaker
+  734  cpanm App::perlbrew
+  735  cpan install ExtUtils::MakeMaker
+  736  conda install perlbrew
+  737  conda install -c conda-forge perlbrew
+  738  cpan App::cpanminus
+  739  sudo yum install perl-ExtUtils-MakeMaker
+  740  ./utils/jb_setup.js
+  741  history | tail -n 60 > ~/working-cmds---complete.txt

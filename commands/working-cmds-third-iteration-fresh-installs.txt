@@ -1,0 +1,30 @@
+ 1117  rm -r jbconnect
+ 1118  ls
+ 1119  conda deactivate
+ 1120  conda remove -n sept2
+ 1121  conda env remove -n sept2
+ 1122  conda create -n jblast-it2 python=3
+ 1123  conda activate jblast-it2
+ 1124  conda install redis
+ 1125  npm install -g sails@1.0.2
+ 1126   
+ 1127  which nopm
+ 1128  which npm
+ 1129  npm --version
+ 1130  echo "~/.nvm/versions/node/v16.7.0/bin/npm"
+ 1131  echo "7.20.3"
+ 1132  git clone http://github.com/gmod/jbconnect
+ 1133  cd jbconnect
+ 1134  conda install -c conda-forge nodejs=10.12
+ 1135  npm install gmod/jblast-jbconnect-hook
+ 1136  npm install enuggetry/blast-ncbi-tools enuggetry/faux-blastdb
+ 1137  ./utils/blast_getBlastUtils.js 2.8.1
+ 1138  npm install @gmod/jbrowse@1.15.1
+ 1139  patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+ 1140  ./utils/jb_setup.js
+ 1141  which sails
+ 1142  echo "~/.nvm/versions/node/v16.7.0/bin/sails"
+ 1143  sails lift
+ 1144  ls ..
+ 1145  history | tail -n 30 | less
+ 1146  history | tail -n 30 >> ../working-cmds-third-iteration-fresh-installs.txt 

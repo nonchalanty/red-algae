@@ -1,0 +1,65 @@
+ 1119  conda deactivate
+ 1120  conda remove -n sept2
+ 1121  conda env remove -n sept2
+ 1122  conda create -n jblast-it2 python=3
+ 1123  conda activate jblast-it2
+ 1124  conda install redis
+ 1125  npm install -g sails@1.0.2
+ 1126
+ 1127  which nopm
+ 1128  which npm
+ 1129  npm --version
+ 1130  echo "~/.nvm/versions/node/v16.7.0/bin/npm"
+ 1131  echo "7.20.3"
+ 1132  git clone http://github.com/gmod/jbconnect
+ 1133  cd jbconnect
+ 1134  conda install -c conda-forge nodejs=10.12
+ 1135  npm install gmod/jblast-jbconnect-hook
+ 1136  npm install enuggetry/blast-ncbi-tools enuggetry/faux-blastdb
+ 1137  ./utils/blast_getBlastUtils.js 2.8.1
+ 1138  npm install @gmod/jbrowse@1.15.1
+ 1139  patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+ 1140  ./utils/jb_setup.js
+ 1141  which sails
+ 1142  echo "~/.nvm/versions/node/v16.7.0/bin/sails"
+ 1143  sails lift
+ 1144  ls ..
+ 1145  history | tail -n 30 | less
+ 1146  history | tail -n 30 >> ../working-cmds-third-iteration-fresh-installs.txt
+ 1147  npm install
+ 1148  sails lift
+ 1149  npm i webpack
+ 1150  npm install
+ 1151  sails lift
+ 1152  npm i webpack-cli
+ 1153  sails lift
+ 1154  npm install --save-dev babel-polyfill
+ 1155  sails lift
+ 1156  npm install @gmod/jbrowse@1.15.1
+ 1157  sails lift
+ 1158  npm install
+ 1159  sails lift
+ 1160  npm install gmod/jblast-jbconnect-hook
+ 1161  npm install @gmod/jbrowse@1.15.1
+ 1162  patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
+ 1163  ./utils/jb_setup.js
+ 1164  sails lift
+ 1165  echo "all the other commands after the first sails lift were playing around to get the 'working' app that was available in the browser but not getting past the index page. So a lot of playing around and reinstalling things until it now works AND is configured, if that makes sense.."
+ 1166*
+ 1167  history | tail -n 49 >> ../working-cmds-third-iteration-fresh-installs--part-2-overlapped--app-was-working-but-not-getting-past-index-page.txt
+
+
+
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$ which node
+~/anaconda3/envs/jblast-it2/bin/node
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$ node --version
+v10.12.0
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$ which npm
+~/anaconda3/envs/jblast-it2/bin/npm
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$ npm --version
+6.4.1
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$ which sails
+~/.nvm/versions/node/v16.7.0/bin/sails
+(jblast-it2) [ec2-user@ip-172-31-89-223 jbconnect]$
+

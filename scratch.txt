@@ -1,0 +1,112 @@
+Working:
+-----
+
+
+/job/submit { service: 'jblast',
+  dataset: 'sample_data/json/volvox',
+  region:
+   '>ctgA ctgA:22031..22100 length=70\nctaggtttagctcgatccacgaatacgacaatacaaggtttgcctcctctttcgtctatcacgcaagctt',
+  workflow: 'faux-blast.blastv.wf.js',
+  session:
+
+
+
+
+/job/submit { service: 'jblast',
+  dataset: 'sample_data/json/volvox',
+  region:
+   '>ctgA ctgA:1182..9028 length=7847\naggcccaagcttgaggtggatgtcacctcgggtactgcctctattacagaggtatcttaatggcgcatccagccttgt\nggctgggtctacgtacgcgtgggcaccatacgtatgttggcag
+gaaaggtcaatcatgcttgtttcctcgtcgcagaa\nacgttcacactattggctcgcgggatcgaacgggcctgattatttttccagctcctgcgttcctatcacgccaactgt\ncgctaataaaatgttatatagagataacccattgctatgcaagga
+tggagaaaccgcttcacaacaccctagaattac\nttcagcactaacatctaagataccgggaaaaccgtaggtgccacttggttttgagggcaatgcctcttgcactggcga\nttcgtggagtaaccttgctaccgatttccaccttttctaggtatgat
+tacatgcgatcgccattgtcagtcgtcgtac\ngaaatccaggaaggaattcgaatacatgaccgaaagctatggcatcataagcgtggctctttactaaggacacgtgta\ngtcggctgatttcgcgcagaacttcgctcaccggacagtgactgctgtc
+cgaacttgggggcagcgtagattctagct\nagagaccgcagcgaaaatgccactcgctaggtggctatggacgtccagctataggcccccacattcgtatgtatactc\ncggtaattgagtctacctttcgaaagatcaaagttcacaaaccttctctca
+cgttaacatagatgctcgcacatagct\nagtccggtgataaagcggccgtgcatgcgagtatttagcgcacggaacagatattaggctgcgaaataccctcatatg\nctacagcgcaggtaacagacggttgatctccccgtagaattccctcaaggccg
+gatcgttctcatgagtagcctttgt\nctgacatttcctctcaatagattgcagactcctgtgtcgtgggaaaacttcgcggaatcgctgtcgttacataaatct\naaacagtgcagtccaagctatttactaccacgtatcataatgaacatctctttgt
+gaaatacgccggtacgccgagag\natcgcccacattgcgtgtcaccaagacccagtgtctattgggcgcgctggttatagtatgcggaggcacccgatgtgc\ntgctaatcactacaaactcgacaccaagaggcgaccgcgtgcgggagggctagaacg
+cgagagccacgtcaacgtggt\nggtaccgctcctgatgatacgagcactgtgctggcaccgctgccctatgtccagctaacaggtgtcacataatatcgc\natctatagttgagtatcttatcgctagcgttacttgtgagttctcgggtagaatcgtcg
+tagcattctagtccttagc\ngtaagcaacgatatcgccgatattataggggcaataggtctcacccaccacgggtgtatatttaacgccctaagtagt\ntaacggagactattaaacaattatgcacgtgaaagattagggtactgcacacgtgtcacgt
+tgacgatgtaaacacca\ntaaaggttgttctgtgatgcgatgcccatacctgcggtgcaacgtcctaaacttatgcggatcaccttctaattcagc\ncgacgttgagaacgccagctatactctgtgagtacaaggtgaaagccccagatcaaaatattg
+gagtcttgtccgtag\nctcttgggtggagagtgtgaccacgtttatcccttaatactgagactcttctcgttccacgccccggacattcgcgat\nacagcctagtttgataggtggctacaagggctctatccgaatagcacaaaactcagtcctagtgc
+gtataggtcgtgc\ntctgcggttatacgctccacagaagaaagtacccactgcagtttgtcggtgggacttagcaaaacctgtaaccaaaac\ncgcacatggactctgttttggtggcgtggagtgtgcccgccgcctttatgctgggtcaaaatactat
+atgatttgttg\ntggtcgggcgcgacattggctcttatggtttataactattattcggtgcacagaaccgacttatgccccgattttgca\ncctcccgagagaaatggtactagtcattgtctcggggttttacaactcaaggataatctgccagcggta
+ccccgaaaa\natcccatcccgaacggctggtacctatgctggagaccgaaatggagccagtgctatgcaaaccctcgctctttctatt\ntggcccgaccagctgcgagagtcattcgacatacattgcgatggctggttcatctctctgcttcggattcc
+gatcctg\nctgcctatggccacaacacgaaagagatcttggatacgtcctcaccatagtccaacggacaaatatggaggtgtacgc\ngcacggatacgagtacgacgggccgcccaatgctggtccttcgtgttatactgtttacttgcctccggtaaga
+gtgta\ncagcttgtacccacgcggtggaggaccttacgcgtcgtccgcaggtgtggagatttcgctacctgttgcattggggcc\ntcgccttacgtttttttcgacggaggcccgacccgccaggccagaccctcatcattgggatttttactgccttgg
+acg\ngcagattctgatgctggtaacgcgcttggcacacaccctggtcgtaattacgtactatcacctctattttaccagggg\ncgggccccgcctcaacgatcggtagtctcgttagaacagttgcttatactccgttagcactcacaactcggagaatg
+a\ngcttacacagtccgtaatagtctccacagcttcccctggaaggttcgtacaggggccctggggtctaatgtgctaccg\ncctaacttcgttagtgtaaggtctcgtgtgcacctccaataacgctgcatttttgtatagaactcctttataggcctg\
+nactcttcggaacagcccactaattgacgtgcacgatgctgcatatacccttctcaatgacgcataccggtgactaaat\ncctgtggctggttgacactttgcataacccaccacgaaaacgcggtttgcacgtggttggaagcgagtaccggttaag\ng
+gaagttacgtaaacccaacatagtgagcgatgcttaaaacactgcatgcgaacaacgaccggaacgagagcctaata\ngaaccaaatggataggtggttacgaaatccgcgcacaagtgtcgtgccactctcgtaaagaatgattgcttgcttatc\ntat
+gagaaacctaataggcacgcacgtgtcgccagggaaaaaccaccatccgacaagacgctgaaaatcgagatagat\ngcagcccgcgcgtactttaagcacgatagccatcttgagcgcgacgattcagcttacggagattacttctcaaagcgg\nacacc
+tcgacgctgaagctctctatcgatgcacttgcatgtccatctacggcttgagcgaaccatgcttaacgcttgg\natgacgttgttagtcggattcgatcgtaccatactgtcctatccatcataacttcccgaattaaaactcattttctac\ncctcatt
+tgtttcattggcgcatatgagcgccccatgggcgctgatcgacacaggcttgtagcgcacggctcgtcttg\ncagtagataaccatagtctttacgtcgcatatattaatatatcctcagacttccactgcggtattttggatcgtggcg\ntctgggaca
+gtcacactctttaacgggagcgcgttcaatgtctgagtccatccgtgcagttcggtgcgattttattct\ntccctgcatcttccggattccttcttcttgtcggagaattcgccgctcgatcaaactcatcattggtacttattgacc\ngtttcatgcta
+ttacaccggtacactgatgataacgctgcggttttatcccccccaatacgcgcacacacgcttcttt\ncggtgcgtcctgtcgtacccctattgcgcatcatggcactccagccgagcaatgctttggacaggtgtaaccaagctg\ngatctagcgtggg
+ttcgacacagctcggttcgtataaccacacgcatgaactgcgagtgcctcgccccagcgccgctg
+
+
+
+Not Working:
+------------
+/job/submit { service: 'jblast',
+  dataset: 'sample_data/json/volvox',
+  region: 'tttatgcctttgtccggtgattctaggttt',
+  workflow: 'faux-blast.blastv.wf.js',
+  refseq: 'ctgA',
+  unmappedSeq: 'true',
+
+
+
+see error:
+
+
+debug: converting blast to json
+debug: blastxml2json /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/sample_data/json/volvox/jblastdata/17_1630438392223.blastxml /home/ec2-user/jbconnect/nod
+e_modules/@gmod/jbrowse/sample_data/json/volvox/jblastdata/17_1630438392223.json
+error: error blast2json { status: 'error',
+  err:
+   TypeError: Cannot read property 'Hsp' of undefined
+       at /home/ec2-user/jbconnect/node_modules/jblast-jbconnect-hook/api/services/blastxml2json.js:93:53
+       at /home/ec2-user/jbconnect/node_modules/xmljson/lib/to_json.js:33:10
+       at Parser.<anonymous> (/home/ec2-user/jbconnect/node_modules/xml2js/lib/xml2js.js:255:20)
+       at Parser.emit (events.js:182:13)
+       at Parser.EventEmitter.emit (domain.js:442:20)
+       at SAXParser.saxParser.onclosetag (/home/ec2-user/jbconnect/node_modules/xml2js/lib/xml2js.js:225:24)
+       at emit (/home/ec2-user/jbconnect/node_modules/xml2js/node_modules/sax/lib/sax.js:615:33)
+       at emitNode (/home/ec2-user/jbconnect/node_modules/xml2js/node_modules/sax/lib/sax.js:620:3)
+       at closeTag (/home/ec2-user/jbconnect/node_modules/xml2js/node_modules/sax/lib/sax.js:861:5)
+       at SAXParser.write (/home/ec2-user/jbconnect/node_modules/xml2js/node_modules/sax/lib/sax.js:1293:29)
+       at Parser.exports.Parser.Parser.parseString (/home/ec2-user/jbconnect/node_modules/xml2js/lib/xml2js.js:273:29)
+       at Parser.parseString (/home/ec2-user/jbconnect/node_modules/xml2js/lib/xml2js.js:6:61)
+       at exports.parseString (/home/ec2-user/jbconnect/node_modules/xml2js/lib/xml2js.js:296:19)
+       at module.exports (/home/ec2-user/jbconnect/node_modules/xmljson/lib/to_json.js:17:9)
+       at /home/ec2-user/jbconnect/node_modules/jblast-jbconnect-hook/api/services/blastxml2json.js:52:17
+       at FSReqWrap.readFileAfterClose [as oncomplete] (internal/fs/read_file_context.js:53:3) }
+debug: >>> kue push event failed 17 Error
+debug: >>> process job event 17 failed Error
+
+
+
+
+
+debug: /job/submit { service: 'jblast',                                                                                                                 [148/1892]
+  dataset: 'sample_data/json/volvox',
+  region: 'tttatgcctttgtcc',
+  workflow: 'faux-blast.blastv.wf.js',
+  refseq: 'ctgA',
+  unmappedSeq: 'true',
+  session:
+
+
+See error:
+
+
+
+debug: converting blast to json
+debug: blastxml2json /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/sample_data/json/volvox/jblastdata/18_1630438450945.blastxml /home/ec2-user/jbconnect/nod
+e_modules/@gmod/jbrowse/sample_data/json/volvox/jblastdata/18_1630438450945.json
+debug: convert successful /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/sample_data/json/volvox/jblastdata/18_1630438450945.blastxml
+debug: getHits()
+debug: >>> getHits return 0 number
+error: No Blast Hits
+debug: >>> kue push event failed 18 No Blast Hits
+debug: >>> process job event 18 failed No Blast Hits

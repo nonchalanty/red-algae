@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,100;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+        .font {
+            font-family: "Nunito", sans-serif;
+        }
+
+        .font2 {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .font3 {
+            font-family: 'Lato', sans-serif;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+</head>
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="http://52.90.88.45:1337/index.html">
+            <img src="./seaweed.png">
+            <span class="is-medium font" style="padding-left: 2em; padding-right: 2em">K. alvarezii Genome Explorer</span>
+
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a href="http://52.90.88.45:1337/index.html" class="navbar-item">
+                Home
+            </a>
+
+            <a class="navbar-item">
+                Documentation
+            </a>
+            <a class="navbar-item">
+                About
+            </a>
+
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    Tools
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii" class="navbar-item">
+                        Genome Browser
+                    </a>
+                    <a href="http://52.90.88.45:1337/statistics.html" class="navbar-item">
+                        Statistics
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary">
+                        <strong>Sign up</strong>
+                    </a>
+                    <a class="button is-light">
+                        Log in
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero is-medium is-warning">
+    <!-- Hero head: will stick at the top -->
+    <div class="hero-head">
+        <!--        <header class="navbar">-->
+        <!--            <div class="container">-->
+        <!--                <div class="navbar-brand">-->
+        <!--                    <a class="navbar-item">-->
+        <!--                        <img src="seaweed.png" alt="Logo">-->
+        <!--                        <span class="is-medium font" style="padding-left: 2em; padding-right: 2em">K. alvarezii Browser</span>-->
+        <!--                    </a>-->
+
+        <!--                    <span class="navbar-burger" data-target="navbarMenuHeroA">-->
+        <!--            <span></span>-->
+        <!--            <span></span>-->
+        <!--            <span></span>-->
+        <!--          </span>-->
+        <!--                </div>-->
+        <!--                <div id="navbarMenuHeroC" class="navbar-menu">-->
+        <!--                    <div class="navbar-end">-->
+        <!--                        <a class="navbar-item is-active">-->
+        <!--                            Home-->
+        <!--                        </a>-->
+        <!--                        <a class="navbar-item">-->
+        <!--                            Examples-->
+        <!--                        </a>-->
+        <!--                        <a class="navbar-item">-->
+        <!--                            Documentation-->
+        <!--                        </a>-->
+        <!--                        <span class="navbar-item">-->
+        <!--              <a class="button is-primary is-inverted">-->
+        <!--                <span class="icon">-->
+        <!--                  <i class="fab fa-github is-success is-inverted"></i>-->
+        <!--                </span>-->
+        <!--                <span>Download</span>-->
+        <!--              </a>-->
+        <!--            </span>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </header>-->
+    </div>
+
+    <!-- Hero content: will be in the middle -->
+    <div class="hero-body">
+        <div class="container has-text-center">
+            <p class="title is-2 is-spaced font">
+                Statistics
+            </p>
+            <h2 class="subtitle">
+                This page is a work in progress. Once complete, it will give an overview
+                of the genome assembly and accompanying annotations. It may include several graphs
+                and/or bullet style statistics. For example, the results of GO enrichment analysis
+                could be displayed visually for users to identify enriched biological processes.
+                Similarly, pathways can be visualised as (for example) nodes and edges. Total
+                numbers of pathways and ontology terms can also be noted.
+            </h2>
+        </div>
+    </div>
+</section>
+
+<section class="section is-medium">
+    <h1 class="title">General Statistics</h1>
+    <h2 class="subtitle">
+        The following are placeholders:
+    </h2>
+    <ul>
+        <li>Total genome size: xx GB</li>
+        <li>Total number of genes: xxxx</li>
+        <li>Total number of transcripts: xxxx</li>
+        <li>Mean depth of coverage: __ X</li>
+        <li>BUSCO results: __</li>
+        <li>Total number of MetaCyc identified pathways: __ </li>
+        <li>Top ten enriched GO terms: __, __, __ </li>
+    </ul>
+</section>
+    <div class="columns">
+        <div class="column is-3">
+        </div>
+        <div class="column is-6">
+    <hr>
+        </div>
+        <div class="column is-3">
+        </div>
+    </div>
+
+<section>
+    <div class="columns">
+        <div class="column is-8">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+                <figure class="image is-5by3" style="margin: auto; border: 2px solid lightgrey">
+                    <img src="./REViGO.png">
+                </figure>
+            </div>
+        </div>
+        <div class="column">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+            <h1 class="title is-4">Gene Ontology Terms</h1>
+            <h2 class="subtitle is-6">
+                Results of REViGO analysis are shown on the left.
+            </h2>
+            </div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-3">
+        </div>
+        <div class="column is-6">
+    <hr>
+        </div>
+        <div class="column is-3">
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

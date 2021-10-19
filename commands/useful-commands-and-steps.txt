@@ -1,0 +1,73 @@
+# Steps taken to download and prepare chondrus chrispus protein blast db for blastx search:
+
+Link to uniprot ftp server with all organisms ref sequen ces (AA sequneces):
+https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/
+
+Link to Chondrus chrispus specifically (use the top level readme to map organism to folder):
+https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/
+
+Download the fasta AA sequence file:
+wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/UP000012073_2769.fasta.gz
+
+Use the blast binaries in this location:
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/
+
+To construct the blast db as follows:
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in UP000012073_2769.fasta -parse_seqids -blastdb_version 5 -title "chondrus_crispus_prot" -out output/chondrus_crispus_prot -taxid 2769 -dbtype prot
+
+Note, to perform taxid lookups aytomatically as part of the blast search is a two step process...
+This file needs to be downloaded in the same dir as your blast db:
+ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
+
+in other words do this:
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
+tar -xzf taxdb.tar.gz
+
+And then see this VERY useful guide (the best one I've seen) for the second step
+(generating the taxid map file used as part of makeblastdb):
+http://www.verdantforce.com/2014/12/building-blast-databases-with-taxonomy.html
+
+Also see this post:
+https://www.biostars.org/p/76551/
+
+Tip: the outformat flag might need to be used in a specific way when running blast.
+As an *example*:
+-outfmt "6 qseqid sseqid evalue pident stitle staxids sscinames scomnames sblastnames sskingdoms salltitles stitle" \
+
+--------
+
+Creating the phycocosm aa blastx db:
+
+use the script in:
+/data/davis--blast-dbs/get_jgi_genomes-release
+
+to do the following:
+cd /databases/blast/
+sudo mkdir phycocosm-proteins
+sudo chmod a+rw phycocosm-proteins/
+
+sign in and then download all phycocosm protein sequences:
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -a -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes   -c signon.cookie -a
+
+download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
+mv download-group\?flt\= all_org_names_and_taxa.csv
+NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
+paste from the web link into the file.
+
+Create a single fasta file from all sep fasta files
+cd pep
+for f in `ls`; do gunzip $f; done
+cat * > ../concatted-phycocosm-proteins.fasta
+cd ../
+
+prepare them as a blastdb with tax ids and appropriately formatted fa headers with seq id and taxa (this is possible attempt one of many because of the fasta headers)
+python make_tax_id_map.py
+python format_fa_headers_for_blast.py
+mkdir output
+
+Build the blastdb
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in concatted-phycocosm-proteins.fasta -parse_seqids -blastdb_version 5 -title "jgi-phycocosm-prot" -out output/jgi-phycocosm-prot -taxid_map tax_map.txt -dbtype prot
+

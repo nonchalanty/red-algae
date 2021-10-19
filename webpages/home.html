@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,100;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+        .font {
+            font-family: "Nunito", sans-serif;
+        }
+
+        .font2 {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .font3 {
+            font-family: 'Lato', sans-serif;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+</head>
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="http://52.90.88.45:1337/index.html">
+            <img src="./seaweed.png">
+            <span class="is-medium font" style="padding-left: 2em; padding-right: 2em">K. alvarezii Genome Explorer</span>
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a href="http://52.90.88.45:1337/index.html" class="navbar-item">
+                Home
+            </a>
+
+            <a class="navbar-item">
+                Documentation
+            </a>
+            <a class="navbar-item">
+                About
+            </a>
+
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    Tools
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii" class="navbar-item">
+                        Genome Browser
+                    </a>
+                    <a href="http://52.90.88.45:1337/statistics.html" class="navbar-item">
+                        Statistics
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary">
+                        <strong>Sign up</strong>
+                    </a>
+                    <a class="button is-light">
+                        Log in
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero is-medium is-primary">
+    <!-- Hero head: will stick at the top -->
+    <div class="hero-head">
+        <!--        <header class="navbar">-->
+        <!--            <div class="container">-->
+        <!--                <div class="navbar-brand">-->
+        <!--                    <a class="navbar-item">-->
+        <!--                        <img src="seaweed.png" alt="Logo">-->
+        <!--                        <span class="is-medium font" style="padding-left: 2em; padding-right: 2em">K. alvarezii Browser</span>-->
+        <!--                    </a>-->
+
+        <!--                    <span class="navbar-burger" data-target="navbarMenuHeroA">-->
+        <!--            <span></span>-->
+        <!--            <span></span>-->
+        <!--            <span></span>-->
+        <!--          </span>-->
+        <!--                </div>-->
+        <!--                <div id="navbarMenuHeroC" class="navbar-menu">-->
+        <!--                    <div class="navbar-end">-->
+        <!--                        <a class="navbar-item is-active">-->
+        <!--                            Home-->
+        <!--                        </a>-->
+        <!--                        <a class="navbar-item">-->
+        <!--                            Examples-->
+        <!--                        </a>-->
+        <!--                        <a class="navbar-item">-->
+        <!--                            Documentation-->
+        <!--                        </a>-->
+        <!--                        <span class="navbar-item">-->
+        <!--              <a class="button is-primary is-inverted">-->
+        <!--                <span class="icon">-->
+        <!--                  <i class="fab fa-github is-success is-inverted"></i>-->
+        <!--                </span>-->
+        <!--                <span>Download</span>-->
+        <!--              </a>-->
+        <!--            </span>-->
+        <!--                    </div>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </header>-->
+    </div>
+
+    <!-- Hero content: will be in the middle -->
+    <div class="hero-body">
+        <div class="container has-text-center">
+            <p class="title is-2 is-spaced font">
+                KaGE: <i>Kappaphycus alvarezii</i> Genome Explorer
+            </p>
+            <h2 class="subtitle">
+                Welcome to KaGE - the <i>Kappaphycus alvarezii</i> Genome Explorer.<br>
+                Use this platform to browse the complete, assembled genome of <i>Kappaphycus alvarazii</i>,
+                accompanying annotations and perform basic analyses on this data.
+            </h2>
+            <h2 class="subtitle">
+                For more information about the genome assembly, and to cite this resource,
+                consult the following:<br>
+                <a href="https://www.biorxiv.org/content/10.1101/2020.02.15.950402v1.full" style="font-style:italic;color: #3673ed; text-decoration: underline">
+                    High-quality de novo genome assembly of Kappaphycus alvarezii based on both PacBio and HiSeq
+                    sequencing
+                    (Jia et al., 2020)
+                </a>
+            </h2>
+        </div>
+    </div>
+</section>
+
+<section class="section is-medium">
+    <h1 class="title">Features</h1>
+    <h2 class="subtitle">
+        At present, the portal includes the following features:
+    </h2>
+</section>
+    <div class="columns">
+        <div class="column is-3">
+        </div>
+        <div class="column is-6">
+    <hr>
+        </div>
+        <div class="column is-3">
+        </div>
+    </div>
+
+<section>
+    <div class="columns">
+        <div class="column is-8">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+                <figure class="image is-5by3" style="margin: auto; border: 2px solid lightgrey">
+                    <img src="./Martons%20blast%20tracks.png">
+                </figure>
+            </div>
+        </div>
+        <div class="column">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+            <h1 class="title is-4">Interactive Genome Browser</h1>
+            <h2 class="subtitle is-6">
+                Navigate the complete genome sequence, down to the base pair level.
+                Copy and compare sequences of interest.
+                Optionally select from an array of annotation and alignment tracks.
+            </h2>
+                <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii">
+                  <button class="button is-primary is-large">Go to Genome Browser</button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-3">
+        </div>
+        <div class="column is-6">
+    <hr>
+        </div>
+        <div class="column is-3">
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column">
+            <div class="container has-text-right" style="padding-left: 2em; padding-right: 2em">
+            <h1 class="title is-4">Rich Feature Annotations</h1>
+            <h2 class="subtitle is-6">
+                Explore <i>in silico</i> predicted genes and transcripts, alongside
+                their functional annotations. This includes functional gene ontologies
+                as well as pathway annotations by Reactome, MetaCyc and others.
+                Search and navigate between these using the search bar and typing for
+                a pathway ID, GO term or other annotation of interest.
+            </h2>
+                <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii&loc=NADL03000001.1%3A931293..994042&tracks=DNA%2CGene%20functional%20annotations%20-%2020k%20rows%20(added%20by%20script%20to%20K.%20alva%20subdir%20of%20data)%2CPredicted%20genes%20(annotated%20as%20GTF)%20%5Bfeature%20format%5D&highlight=">
+                  <button class="button is-primary is-large">View Annotations in Genome Browser</button>
+                </a>
+            </div>
+        </div>
+                <div class="column is-8">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+                <figure class="image is-5by3" style="margin: auto; ">
+                    <img src="./annotations-revd.png">
+                </figure>
+            </div>
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-3">
+        </div>
+        <div class="column is-6">
+    <hr>
+        </div>
+        <div class="column is-3">
+        </div>
+    </div>
+    <div class="columns">
+        <div class="column is-8">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+                <figure class="image is-5by3" style="margin: auto; border: 2px solid lightgrey">
+                    <img src="./blastdb.png">
+                </figure>
+            </div>
+        </div>
+        <div class="column">
+            <div class="container" style="padding-left: 2em; padding-right: 2em">
+            <h1 class="title is-4">On-the-fly Blast Functionality</h1>
+            <h2 class="subtitle is-6">
+                Perform Blastn searches directly in the browser by highlighting a sequence of interest
+                and then immediately view the results as annotation tracks.
+                Result tracks can be toggled on or off, and "hits" filtered by E-score and other
+                parameters. Blast searches can be performed against both the small, example <i>faux</i>
+                database as well as the complete JGI Phycocosm (algal) blast database.
+                Arbitrary sequences can also be pasted and used in blast searches.
+            </h2>
+                <h2 class="subtitle is-6"><b>Note:</b> currently, users must be logged in to access blast functionality.
+                    Guest users can explore this functionality using the username "user" and password "password".</h2>
+                <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii&loc=NADL03000002.1%3A1398701..1522200&tracks=DNA%2CGene%20functional%20annotations%20-%2020k%20rows%20(added%20by%20script%20to%20K.%20alva%20subdir%20of%20data)%2CPredicted%20genes%20(annotated%20as%20GTF)%20%5Bfeature%20format%5D&highlight=NADL03000002.1%3A1456200..1464999">
+                  <button class="button is-primary is-large">Perform Blastn Search</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
