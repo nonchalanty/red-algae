@@ -71,3 +71,47 @@ mkdir output
 Build the blastdb
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in concatted-phycocosm-proteins.fasta -parse_seqids -blastdb_version 5 -title "jgi-phycocosm-prot" -out output/jgi-phycocosm-prot -taxid_map tax_map.txt -dbtype prot
 
+ok so actually, after much experimentation I decided to not run the above makeblastdb command.
+There were too many cryptic errors no matter how I tried to format the fasta headers and/or the tax_map.txt file to
+accommodate these.
+Instead, I ran the following command (i.e. I didnt tell blast to expect ncbi std formatted headers - the advice I've come across most often
+ is to omit this if the files arent already in the ncbi format because its a headache).
+
+ /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm-proteins.fasta -blastdb_version 5 -title "jgi-phycocosm-prot" -out jgi-phycocosm-prot -dbtype prot -max_file_sz '4GB'
+
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+To test the blast output format generated:
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/blastx \
+-db /home/ec2-user/jbconnect/blastdb/phycocosm-prot/jgi-phycocosm-prot \
+-query /home/ec2-user/jbconnect/blastdb/tmp/ \
+76-jgi-phycocsm-original-blastx-job-blastx-query-seq.fasta \
+-outfmt '7 qaccver sseqid saccver qstart qend sstart send sseq evalue bitscore length pident nident mismatch gapopen staxid ssciname scomname stitle' -out /home/ec2-user/jbconnect/blastdb/tmp/test-jgi-phycocsm-blastx-job-blastx-results.tsv
+
+
+-----------
+
+Mycocosm steps:
+
+cd /databases/blast/
+mkdir mycocosm-proteins
+sudo chmod a+rw mycocosm-proteins/
+cd mycocosm-proteins
+
+sign in and then download all phycocosm protein sequences:
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f
+
+download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
+mv download-group\?flt\= all_org_names_and_taxa.csv
+NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
+paste from the web link into the file.
+
+Create a single fasta file from all sep fasta files
+cd pep
+for f in `ls`; do gunzip $f; done
+cat * > ../concatted-phycocosm-proteins.fasta
+cd ../
+
