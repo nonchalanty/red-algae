@@ -109,9 +109,34 @@ mv download-group\?flt\= all_org_names_and_taxa.csv
 NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
 paste from the web link into the file.
 
-Create a single fasta file from all sep fasta files
+install gnu parallel (easy):
+http://git.savannah.gnu.org/cgit/parallel.git/tree/README
+
+Create a single fasta file from all sep fasta files and format their headers at the same time
 cd pep
 for f in `ls`; do gunzip $f; done
-cat * > ../concatted-phycocosm-proteins.fasta
 cd ../
+python format-and-build-fa.py
+OOOOORRRRR.... run the same script in parallel much faster (preferred choice in theory but it seems to be way too slow so maybe stick with normal execution if this at first seems slow (dont increase -j here rhough!)):
+for f in `ls pep/*.aa.fasta`; do echo "python format-and-build-fa.py ${f}"; done | parallel -j 6 -k
 
+then concat all these temp files into a single fasta:
+cat tmp_files/*.aa.fasta.tmp > concatted-mycocosm.formatted.fasta
+
+[to be cont]
+
+
+-----------
+
+JGI Phytozome steps:
+cd /databases/blast
+sudo mkdir phytozome12-proteins
+sudo chmod a+rw phytozome12-proteins/
+cd phytozome12-proteins
+
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12 -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12
+
+
+download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
