@@ -123,7 +123,21 @@ for f in `ls pep/*.aa.fasta`; do echo "python format-and-build-fa.py ${f}"; done
 then concat all these temp files into a single fasta:
 cat tmp_files/*.aa.fasta.tmp > concatted-mycocosm.formatted.fasta
 
-[to be cont]
+Build the blastdb
+mkdir output
+cd output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in ../concatted-mycocosm.formatted.fasta -blastdb_version 5 \
+-title "jgi-mycocosm-prot" -out jgi-mycocosm-prot \
+-dbtype prot -max_file_sz '4GB'
+
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+a workflow script was created in the usual place (jbconnect/node_modules/blastx-../workflows/...py and softlinked into jbconnect/workflows
+and the above blast db was softlinked into the uisual place: jbconnect/blastdb/
+
+Tested successfully in app.
+Complete.
 
 
 -----------
@@ -139,4 +153,417 @@ cd phytozome12-proteins
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12
 
 
-download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+download all phycocosm/mycocosm taxon ids (this was acquired via new email query to JGI answered on oct 20th by David Goodstein):
+cd PhytozomeV12
+curl -X GET "https://phytozome-next.jgi.doe.gov/api/db/properties/proteome/456%2C502%2C281%2C461%2C227%2C325%2C228%2C229%2C231%2C317%2C539%2C538%2C320%2C318%2C310%2C522%2C521%2C676%2C91%2C572%2C291%2C531%2C566%2C322%2C459%2C548%2C392%2C382%2C309%2C692%2C575%2C453%2C388%2C494%2C589%2C467%2C689%2C256%2C506%2C553%2C505%2C551%2C451%2C390%2C514%2C691%2C448%2C686%2C297%2C457%2C530%2C679%2C673%2C492%2C122%2C501%2C677%2C675%2C275%2C508%2C678%2C510%2C509%2C571%2C567%2C491%2C285%2C580%2C581%2C563%2C442%2C670%2C534%2C298%2C687%2C385%2C573%2C562%2C561%2C588%2C469%2C540%2C545%2C544%2C541%2C558%2C543%2C559%2C507%2C200%2C305%2C520%2C671%2C445%2C210%2C444%2C533%2C532%2C119%2C289%2C519%2C518%2C449%2C113%2C233%2C523%2C472%2C264%2C384%2C167%2C447%2C278%2C266%2C474%2C470%2C484%2C585%2C482%2C489%2C582%2C483%2C173%2C485%2C478%2C476%2C477%2C473%2C574%2C486%2C479%2C446%2C277%2C481%2C488%2C487%2C480%2C584%2C475%2C471%2C583%2C526%2C529%2C458%2C527%2C524%2C221%2C525%2C182%2C154%2C565%2C586%2C321%2C498%2C504%2C550%2C587%2C304%2C290%2C324%2C668%2C462%2C386%2C323%2C499%2C680%2C503%2C296%2C463%2C577%2C316%2C490%2C314%2C556%2C549%2C460%2C537%2C515%2C283%2C337%2C343%2C364%2C379%2C336%2C369%2C356%2C333%2C381%2C359%2C372%2C355%2C349%2C362%2C353%2C331%2C361%2C378%2C346%2C328%2C344%2C374%2C380%2C357%2C363%2C352%2C334%2C365%2C345%2C376%2C367%2C354%2C370%2C329%2C348%2C358%2C338%2C366%2C339%2C375%2C351%2C342%2C330%2C368%2C347%2C377%2C350%2C373%2C335%2C326%2C360%2C340%2C371%2C341%2C332%2C327%2C560%2C497%2C450%2C516%2C672%2C312%2C311%2C500%2C454%2C564%2C552%2C468%2C669%2C493%2C681%2C682%2C683%2C443%2C513%2C684%2C512%2C685%2C308%2C495%2C590%2C496%2C591?format=tsv" -H "accept: application/json"  > all_orgs_and_taxids.tsv
+NB to note: we filter out the ones that are "restricted" in the python formatting script
+
+cd pep
+for f in `ls`; do gunzip $f; done
+cd ..
+
+format fasta headers of files and concat into one fasta:
+python format-and-build-fa.py
+
+build blastdb:
+mkdir output
+cat tmp_files/*.tmp > concatted-phytozome.formatted.fasta
+cd output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in ../concatted-phytozome.formatted.fasta -blastdb_version 5 \
+-title "jgi-phytozome-prot" -out jgi-phytozome-prot \
+-dbtype prot
+
+
+
+-----
+Build EBI bacterial blastx db steps:
+
+cd /databases/blast
+sudo mkdir ebi-bacterial
+sudo chmod a+rw ebi-bacterial/
+cd ebi-bacterial/
+
+Download table with ALL bacterial assemblies from EBI (this command was built using the webportal available at: https://www.ebi.ac.uk/ena/browser/)
+curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'result=assembly&query=tax_tree(2)&fields=accession%2Cassembly_title%2Cstudy_description%2Cscientific_name%2Ctax_id&limit=0&format=tsv' "https://www.ebi.ac.uk/ena/portal/api/search" > all_bacterial_accessions_taxon_2.tsv
+Nevermind, scratch that. The EBI bacterial data portal does not have protein sequences.
+Instead, we used ensembl bacterial portal and went to the download section, i.e: https://bacteria.ensembl.org/info/data/ftp/index.html
+
+So:
+cd ../
+sudo mkdir ensembl-bacteria
+sudo chmod a+rw ensembl-bacteria/
+cd ensembl-bacteria
+rsync --list-only -av --include='**/pep/*' rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ . | grep "/pep/" | sed "s|^.* bacteria_|bacteria_|g" > file_list_to_dl.txt
+
+which gives this example output (sample only):
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/Acinetobacter_baumannii_aye_gca_000069245.ASM6924v1.pep.all.fa.gz
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/CHECKSUMS
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/README
+
+Then use this file in the rsync cmd (I tried various combinations of --include-pattern and --exclude-pattern to no avail btw):
+
+
+
+
+ranodm;
+
+        {
+         "category" : "Annotations",
+         "key" : "Repeat Masker",
+         "label" : "Repeat Masker",
+         "metadata" : {
+            "description" : "Repeat Masker"
+         },
+         "storeClass" : "JBrowse/Store/SeqFeature/GFF3",
+         "trackId" : "Repeat Masker",
+         "type" : "CanvasFeatures",
+         "urlTemplate" : "repeat_masker/Kappaphycus_alvarezii.fasta.out.gff"
+      }
+
+
+random backup of traclist.json oct 22:
+------
+{
+    "bpSizeLimit": 25000,
+    "dataset_id": "Kappaphycus_alvarezii",
+    "formatVersion": 1,
+    "include": [
+        "/track/get_tracklist?dataset=data/Kappaphycus_alvarezii"
+    ],
+    "names": {
+        "type": "Hash",
+        "url": "names/"
+    },
+    "plugins": [
+        "HideTrackLabels",
+        "NeatCanvasFeatures",
+        "NeatHTMLFeatures",
+        "JBAnalyze",
+        "JBClient",
+        "JBCdemo",
+        "JBlast",
+        "blastx"
+    ],
+    "tracks": [
+        {
+            "category": "Reference sequence",
+            "chunkSize": 20000,
+            "key": "Reference sequence",
+            "label": "DNA",
+            "seqType": "dna",
+            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+            "type": "SequenceTrack",
+            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757333",
+            "label": "SRR2757333",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360608; Run acn: SRR2757333]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757333.bam"
+        },
+        {
+            "category": "RNAseq alignments / Illumina HiSeq 2000 paired end sequencing",
+            "key": "ERR2041141",
+            "label": "ERR2041141",
+            "metadata": {
+                "description": "Illumina HiSeq 2000 paired end sequencing [SRA project acn: ERP023948; Experiment acn: ERX2100198; Run acn: ERR2041141]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/ERR2041141.bam"
+        },
+        {
+            "category": "RNAseq alignments / De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae- Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis",
+            "key": "SRR1763039",
+            "label": "SRR1763039",
+            "metadata": {
+                "description": "De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae, Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis [SRA project acn: SRP052519; Experiment acn: SRX845433; Run acn: SRR1763039]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1763039.bam"
+        },
+        {
+            "category": "RNAseq alignments / Transcriptome sequencing and characterization for Kappaphycus alvarezii",
+            "key": "SRR1207056",
+            "label": "SRR1207056",
+            "metadata": {
+                "description": "Transcriptome sequencing and characterization for Kappaphycus alvarezii (Doty) [SRA project acn: SRP040669; Experiment acn: SRX502687; Run acn: SRR1207056]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1207056.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757332",
+            "label": "SRR2757332",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360503; Run acn: SRR2757332]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757332.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757334",
+            "label": "SRR2757334",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360622; Run acn: SRR2757334]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757334.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757335",
+            "label": "SRR2757335",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360666; Run acn: SRR2757335]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757335.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757337",
+            "label": "SRR2757337",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360673; Run acn: SRR2757337]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757337.bam"
+        },
+        {
+            "category": "RNAseq alignments / Transcriptome of Kappaphycus alvarezii",
+            "key": "SRR5357790",
+            "label": "SRR5357790",
+            "metadata": {
+                "description": "Transcriptome of Kappaphycus alvarezii [SRA project acn: SRP102128; Experiment acn: SRX2653631; Run acn: SRR5357790]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR5357790.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466463",
+            "label": "SRR6466463",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556421; Run acn: SRR6466463]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466463.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466464",
+            "label": "SRR6466464",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556420; Run acn: SRR6466464]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466464.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466465",
+            "label": "SRR6466465",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556419; Run acn: SRR6466465]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466465.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466466",
+            "label": "SRR6466466",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556418; Run acn: SRR6466466]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466466.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466467",
+            "label": "SRR6466467",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556417; Run acn: SRR6466467]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466467.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus Alvarezii-Wild type",
+            "key": "SRR7637208",
+            "label": "SRR7637208",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus Alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500752; Run acn: SRR7637208]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637208.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus Alvarezii-Wild type",
+            "key": "SRR7637235",
+            "label": "SRR7637235",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus Alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500779; Run acn: SRR7637235]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637235.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637249",
+            "label": "SRR7637249",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500793; Run acn: SRR7637249]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637249.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-Wild type",
+            "key": "SRR7637250",
+            "label": "SRR7637250",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500794; Run acn: SRR7637250]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637250.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637252",
+            "label": "SRR7637252",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500796; Run acn: SRR7637252]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637252.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637253",
+            "label": "SRR7637253",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500797; Run acn: SRR7637253]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637253.bam"
+        },
+        {
+            "category": "RNAseq alignments / Marine Maroalga Kappaphycus alvarezii transcriptome under low temperature",
+            "key": "SRR1762980",
+            "label": "SRR1762980",
+            "metadata": {
+                "description": "Marine Maroalga Kappaphycus alvarezii transcriptome under low temperature [SRA project acn: SRP052517; Experiment acn: SRX845400; Run acn: SRR1762980]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1762980.bam"
+        },
+        {
+            "category": "RNAseq alignments / De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae- Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis",
+            "key": "SRR1763037",
+            "label": "SRR1763037",
+            "metadata": {
+                "description": "De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae, Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis [SRA project acn: SRP052518; Experiment acn: SRX845422; Run acn: SRR1763037]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1763037.bam"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 80% identities, min 50bp",
+            "label": "Blastx, 80% identities, min 50bp",
+            "metadata": {
+                "description": "Blastx, 80% identities, min 50bp"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_80pc_50bp.bed.gz.tbi",
+            "trackId": "Annotation_blastx_80pc_50bp",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_80pc_50bp.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 80% identities, min 75% length",
+            "label": "Blastx, 80% identities, min 75% length",
+            "metadata": {
+                "description": "Blastx, 80% identities, min 75% length"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_80pc_75pc.bed.gz.tbi",
+            "trackId": "Annotation_blastx_80pc_75",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_80pc_75pc.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 90% identities, min 50bp",
+            "label": "Blastx, 90% identities, min 50bp",
+            "metadata": {
+                "description": "Blastx, 90% identities, min 50bp"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_90pc_50bp.bed.gz.tbi",
+            "trackId": "Annotation_blastx_90pc_50bp",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_90pc_50bp.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 90% identities, min 75% length",
+            "label": "Blastx, 90% identities, min 75% length",
+            "metadata": {
+                "description": "Blastx, 90% identities, min 75% length"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_90pc_75pc.bed.gz.tbi",
+            "trackId": "Annotation_blastx_90pc_75pc",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_90pc_75pc.bed.gz"
+        },
+        {
+            "category": "Annotations",
+            "compress": 0,
+            "key": "Gene functional annotations full - all rows (added by script to K. alva subdir of data)",
+            "label": "Gene functional annotations full - all rows (added by script to K. alva subdir of data)",
+            "storeClass": "JBrowse/Store/SeqFeature/NCList",
+            "style": {
+                "className": "feature"
+            },
+            "trackType": null,
+            "type": "FeatureTrack",
+            "urlTemplate": "tracks/Gene functional annotations full - all rows (added by script to K. alva subdir of data)/{refseq}/trackData.json"
+        }
+    ]
+}
+
+------
