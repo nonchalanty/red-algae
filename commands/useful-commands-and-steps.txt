@@ -1,4 +1,17 @@
-# Steps taken to download and prepare chondrus chrispus protein blast db for blastx search:
+# Steps to start jbconect server
+The steps werent recorded here but a few rough documents I made outline the installation steps ("working-cmds-.....txt")
+But some other useful things to note for future:
+
+- the jbconnect/sails server is being run from the (base) conda env!
+- it is being run in a tmux session called "serve"
+
+------------------------------------------------------------------------------------------
+# I think this was the cmd used to build the current (soon to be replaced) annotation track
+some cmd here to add gff
+./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+
+------------------------------------------------------------------------------------------
+# Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
 
 Link to uniprot ftp server with all organisms ref sequen ces (AA sequneces):
 https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/
@@ -174,7 +187,8 @@ cd output
 -title "jgi-phytozome-prot" -out jgi-phytozome-prot \
 -dbtype prot
 
-
+then add the relevant workflow scripts to the blastx plugin dir and
+symlink into jbconnect workflows, like followed in one of the above process.
 
 -----
 Build EBI bacterial blastx db steps:
@@ -197,15 +211,71 @@ cd ensembl-bacteria
 rsync --list-only -av --include='**/pep/*' rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ . | grep "/pep/" | sed "s|^.* bacteria_|bacteria_|g" > file_list_to_dl.txt
 
 which gives this example output (sample only):
+head -n 3 file_list_to_dl.txt
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/Acinetobacter_baumannii_aye_gca_000069245.ASM6924v1.pep.all.fa.gz
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/CHECKSUMS
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/README
 
 Then use this file in the rsync cmd (I tried various combinations of --include-pattern and --exclude-pattern to no avail btw):
+rsync -avrP --files-from=file_list_to_dl.txt rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ .
+note that you might need to run with the flag if rsync crashes with a weird error (its due to high mem/cpu usage on the machine even though it doesnt sound like it):
+--bwlimit=6000
+mkdir downloaded
+mv * downloaded
+mv downloaded/file_list_to_dl.txt .
+
+format fasta headers (and bring in info from the file name into the header)
+(no need to unzip fasta files)
+python format-fa-headers.py
+
+build blastdb:
+mkdir blastdb_output
+(the following is needed because a simple ls or cat will fail with so many files found:)
+find output/ -name '*.tmp' -print0 | xargs -0 cat > concatted-ensemble-bacteria.formatted.fasta
+(note that the above file is massive: about 76GB; so we will delete it when done)
+cd blastdb_output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in /databases/blast/ensembl-bacteria/concatted-ensemble-bacteria.formatted.fasta -blastdb_version 5 \
+-title "ens-bacteria-prot" -out ens-bacteria-prot \
+-dbtype prot
+
+rm concatted-ensemble-bacteria.formatted.fasta
+touch concatted-ensemble-bacteria.formatted.fasta.was.removed.due.to.size--regenerate-it-with-cat
+
+
+------------------------------------------------------
+# Installing sequenceserver
+
+mkdir /blastdb/sequenceserver
+cd /blastdb
+chmod a+rw sequenceserver
+cd sequenceserver
+# sudo yum -y install gem  --> ran this first but it crashed so reran the following cmd and it worked:
+sudo yum install ruby-devel
+gem install sequenceserver
+
+set up directory to store blastdbs for seq server and link in the latest gene/prot prediction seqs:
+mkdir /blastdb/sequenceserver/dbs
+cd /blastdb/sequenceserver/dbs
+ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_proteins_v2.fasta .
+ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_cdna_v2.fasta .
+
+tmux
+then rename it to sequenceserver
+tmux a -t sequenceserver
+
+then run sequenceserver to set it up for the first time and follow the prompts:
+sequenceserver
+and supply it with the blast+ binaries and dbs folder, i.e.:
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/
+
+to restart the server in future, you just rerun:
+sequenceserver
 
 
 
 
+---------------------------------------------------------
 ranodm;
 
         {
