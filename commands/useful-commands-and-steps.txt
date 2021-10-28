@@ -6,6 +6,45 @@ But some other useful things to note for future:
 - it is being run in a tmux session called "serve"
 
 ------------------------------------------------------------------------------------------
+# Stesp to copy meiks transcriptome across to ec2 instance:
+
+first mkdirs:
+/databases/transcriptome_assembly_meik
+
+then from within the cro server, inside my ftp folder space:
+scp -i deleteme.txt -r 01_denovo ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
+scp -i deleteme.txt -r 02_guided ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
+
+then add as tracks:
+mkdir /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+
+ln -s /databases/transcriptome_assembly_meik/01_denovo/redalgae-denovo.fasta .
+ln -s /databases/transcriptome_assembly_meik/02_guided/redalgae-guided.fasta .
+samtools faidx redalgae-denovo.fasta
+samtools faidx redalgae-guided.fasta
+cd ../..
+
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-denovo.fasta \
+--out data/Kappaphycus_alvarezii \
+--trackLabel "De novo Transcriptome assembly" \
+--key "De novo Transcriptome assembly"
+
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-guided.fasta \
+--out data/Kappaphycus_alvarezii \
+--trackLabel "Guided Transcriptome assembly" \
+--key "Guided Transcriptome assembly"
+
+(--indexed_fasta did not work in borwser!)
+
+------------------------------------------------------------------------------------------
+# I think this was the cmd to add the repeat mnasker track:
+./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
+
+
+------------------------------------------------------------------------------------------
 # I think this was the cmd used to build the current (soon to be replaced) annotation track
 some cmd here to add gff
 ./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
