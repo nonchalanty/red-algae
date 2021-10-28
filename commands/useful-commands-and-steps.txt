@@ -242,6 +242,15 @@ cd blastdb_output
 rm concatted-ensemble-bacteria.formatted.fasta
 touch concatted-ensemble-bacteria.formatted.fasta.was.removed.due.to.size--regenerate-it-with-cat
 
+NB!! there is a chance the whole db was not moved over as the connection broke
+(instead of the abopve cmd,
+I actually built the db in /blastdb, deleted the concatted fasta file, and moved it back to
+the working dir of /databases/blast/ens....
+Now since I deleted the concatted fasta (which took long to build), it would be difficult to
+rebuild (since I am pretty sure that the whole dir was indeed copied) - its low risk but
+bear in mind in case any weird results later on. Also, it **did** run the above touch cmd
+automatically (i pasted it and ran it during the execution, so once the first cmd finished then it
+would only have run the touch cmd, which it did).
 
 ------------------------------------------------------
 # Installing sequenceserver
@@ -259,6 +268,9 @@ mkdir /blastdb/sequenceserver/dbs
 cd /blastdb/sequenceserver/dbs
 ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_proteins_v2.fasta .
 ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_cdna_v2.fasta .
+do the same for the genome assemby:
+ln -s /data/moved-from-home-dir/data/kappaphycus_alvarezii_genome/GCA_002205965.3_ASM220596v3_genomic.fasta .
+
 
 tmux
 then rename it to sequenceserver
