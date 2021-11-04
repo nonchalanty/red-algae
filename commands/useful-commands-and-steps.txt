@@ -49,6 +49,179 @@ data/transcriptome/redalgae-guided.fasta \
 some cmd here to add gff
 ./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
 
+
+------------------------------------------------------------------------------------------
+# Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
+
+
+
+install gnu parallel (easy):
+http://git.savannah.gnu.org/cgit/parallel.git/tree/README
+
+tmux a -t build-blast-db
+
+The following are completed after phycocosm sequences are already downloaded to the below path, using get_jgi_genomes gutub open source tool
+cd /blastdb/phycocosm
+
+for f in `ls assembly/*.fasta`; do echo "python format-and-build-fasta.py ${f}"; done | parallel -j 6 -k
+
+mkdir annotated-assembly-v2/
+cat tmp_files/*.tmp > annotated-assembly-v2/concatted-phycocosm.fasta
+cd annotated-assembly-v2/
+mkdir output
+cd output
+
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm.fasta -blastdb_version 5 -title "jgi-phycocosm" -out jgi-phycocosm -dbtype nucl
+
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+Then test the run using the following:
+/data/jbconnect/blastbin/ncbi-blast-2.8.1+/bin/blastn -db /data/jbconnect/blastdb/jgi-phycocosm/jgi-phycocosm -outfmt 5 -out /data/jbconnect/node_modules/@gmod/jbrowse/d
+ata/Kappaphycus_alvarezii/jblastdata/592c1e30-3c70-11ec-9eee-5b7e88f1a1a1.blastxml -query /data/jbconnect/node_modules/@gmod/jbrowse/data/Kappaphycus_alvarezii/jblastdata/blast_region16
+35921371543.fa
+
+
+
+------------------------------------------------------------------------------------------
+# Steps taken to download and install pathway tools (rough copy paste of most of the cmds)
+ 1004  mkdir p-tools
+ 1005  chmod a+rw p-tools/
+ 1006  cd p-tools/
+ 1007  wget http://bioinformatics.ai.sri.com/ecocyc/dist/ptools-tier1-34987569/pathway-tools-25.0-linux-64-tier1-install
+ 1008  wget --user=ptools-runtimes --password=runtimes-14285  http://bioinformatics.ai.sri.com/ecocyc/dist/ptools-tier1-34987569/pathway-tools-25.0-linux-64-tier1-install
+ 1009  which csh
+ 1010  yum install motif
+ 1011  sudo yum install motif
+ 1012  ls
+ 1013  lbblk
+ 1014  lsblk
+ 1015  sudo file -s /dev/xvdi
+ 1016  sudo mkfs -t xfs /dev/xvdi
+ 1017  sudo mkdir /large-store
+ 1018  sudo mount /dev/xvdi /large-store
+ 1019  chmod a+rw /large-store/
+ 1020  sudo chmod a+rw /large-store/
+ 1021  pwd
+ 1022  ls
+ 1023  cd ..
+ 1024  ls
+ 1025  mv p-tools/ /large-store/
+ 1026  cd /large-store/
+ 1027  ls
+ 1028  cd p-tools/
+
+chmod u+x pathway-tools-25.0-linux-64-tier1-install
+
+To allow x11 forwarding:
+sudo yum install xorg-x11-xauth
+
+sudo yum install gnome-terminal
+
+tmux a -t ptools
+
+ mkdir pathway-tools
+ mkdir data
+
+./pathway-tools-25.0-linux-64-tier1-install
+
+ Review settings before copying files
+
+Install Directory:
+      /large-store/p-tools/pathway-tools
+
+      Pathway Tools Configuration and Data Directory:
+      /large-store/p-tools/data/ptools-local
+
+
+then run the software (doesnt work, throws errors):
+./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+
+Some errors (slightly different after conda deactivating):
+******
+(base) [ec2-user@ip-172-31-89-223 p-tools]$ conda deactivate
+[ec2-user@ip-172-31-89-223 p-tools]$
+[ec2-user@ip-172-31-89-223 p-tools]$
+[ec2-user@ip-172-31-89-223 p-tools]$
+[ec2-user@ip-172-31-89-223 p-tools]$ ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+Warning: Loading sys:climxm.so failed with error:
+         libXpm.so.4: cannot open shared object file: No such file or directory.
+;; ensure-directories-exist: creating
+;;   /large-store/p-tools/pathway-tools/aic-export/pathway-tools/ptools/25.0/patches/bin-acl-10-1-amd64-linux/
+;; Directory
+;;   /large-store/p-tools/pathway-tools/aic-export/pathway-tools/ptools/25.0/patches/bin-acl-10-1-amd64-linux/
+;;   does not exist, will create.
+;; Optimization settings: safety 3, space 1, speed 1, debug 3.
+;; For a complete description of all compiler switches given the
+;; current optimization settings evaluate (EXPLAIN-COMPILER-SETTINGS).
+An unhandled error occurred during initialization:
+Attempt to call
+#("InitializeMyDrawingAreaQueryGeometry" 140226142711360 0 2
+  140226142711360 8)
+for which the definition has not yet been (or is no longer) loaded.
+*****
+
+Then I did this (not sure if its right but it seems to get me further):
+
+sudo yum install libXpm
+./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+
+which gave the following errors:
+****
+Error: Init file /large-store/p-tools/data/ptools-local/ptools-init.dat
+       not found.
+This probably means that Pathway Tools installation did not complete
+       successfully.
+Check for installation errors or try reinstalling.
+If this is a shared installation, you will need to generate your own
+       init file.
+To do this, invoke pathway-tools with the -config option.
+
+
+Restart actions (select using :continue):
+ 0: Abort entirely from this (lisp) process.
+*****
+
+exit
+ssh back in (to rather try from the std conda base env like before, now that we have libxm installed)
+./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+ok so still same errors as before, which means we need to do the conda deactivate afterall:
+*******
+An unhandled error occurred during initialization:
+Error #<FILE-ERROR @ #x1007428ca52> occurred loading OpenSSL
+libraries.  Is OpenSSL installed in a standard place, or is
+LD_LIBRARY_PATH set?.
+Loading libcrypto.so failed with error:
+libcrypto.so: cannot open shared object file: No such file or directory.
+
+****
+
+conda deactivate
+then create a config file since one doesnt exist yet:
+./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools -config
+
+less /large-store/p-tools/data/ptools-local/ptools-init.dat
+nano /large-store/p-tools/data/ptools-local/ptools-init.dat
+
+^ edit the above file to have the following:
+WWW-Server-SSL-Certificate NIL
+WWW-Server-Hostname localhost
+WWW-Server-Port 1555
+
+tmux a -t ptools
+conda deactivate
+
+now, it is essential to proceed using the *xQuartz terminal* (if on mac)!
+Using that terminal (not a normal/pychar,m terminal), ssh in with the -Y flag
+and rejoin the tmux session and then run:
+./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools -www -www-server-hostname 0.0.0.0
+(when asked for x forwarding display to use, type in localhost:10.0 and hit enter a few times)
+then wait at least a minute and a wiondow shold display ion your mac!
+
+Then open up port :1555 in AWS console so that we can acces the webs erver
+
+seems to not quite work
+
+
 ------------------------------------------------------------------------------------------
 # Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
 
