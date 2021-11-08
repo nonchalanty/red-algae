@@ -1,0 +1,193 @@
+TermID	Name	Frequency	Pin	Value	Uniqueness	Dispensability	Subontoloy
+GO:0003777	microtubule motor activity	0.187%		NaN	0.98	0.00	MF
+GO:0009976	tocopherol cyclase activity	0.002%		NaN	0.97	0.00	MF
+GO:0016531	copper chaperone activity	0.009%		NaN	0.99	0.00	MF
+GO:0017056	structural constituent of nuclear pore	0.066%		NaN	0.97	0.00	MF
+GO:0042030	ATPase inhibitor activity	0.016%		NaN	0.98	0.00	MF
+GO:0043856	anti-sigma factor antagonist activity	0.036%		NaN	0.98	0.00	MF
+GO:2001070	starch binding	0.023%		NaN	1.00	0.00	MF
+GO:0016251	RNA polymerase II general transcription initiation factor activity	0.016%		NaN	0.93	0.01	MF
+GO:0047793	cycloeucalenol cycloisomerase activity	0.001%		NaN	0.93	0.02	MF
+GO:0016853	isomerase activity	2.527%		NaN	0.95	0.02	MF
+GO:0050194	phosphonoacetaldehyde hydrolase activity	0.003%		NaN	0.93	0.02	MF
+GO:0045550	geranylgeranyl reductase activity	0.003%		NaN	0.92	0.02	MF
+GO:0016851	magnesium chelatase activity	0.010%		NaN	0.91	0.03	MF
+GO:0030366	molybdopterin synthase activity	0.016%		NaN	0.88	0.03	MF
+GO:0008685	2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase activity	0.024%		NaN	0.91	0.03	MF
+GO:0032051	clathrin light chain binding	0.010%		NaN	0.99	0.03	MF
+GO:0008139	nuclear localization sequence binding	0.011%		NaN	0.99	0.03	MF
+GO:0005545	1-phosphatidylinositol binding	0.017%		NaN	0.99	0.03	MF
+GO:0043023	ribosomal large subunit binding	0.069%		NaN	0.99	0.03	MF
+GO:0008061	chitin binding	0.115%		NaN	0.99	0.04	MF
+GO:0016829	lyase activity	3.597%		NaN	0.95	0.05	MF
+GO:0020037	heme binding	1.452%		NaN	0.99	0.05	MF
+GO:0017070	U6 snRNA binding	0.012%		NaN	0.99	0.09	MF
+GO:0033916	beta-agarase activity	0.001%		NaN	0.92	0.12	MF
+GO:0050487	sulfoacetaldehyde acetyltransferase activity	0.002%		NaN	0.88	0.12	MF
+GO:0050333	thiamin-triphosphatase activity	0.001%		NaN	0.93	0.12	MF
+GO:0046406	magnesium protoporphyrin IX methyltransferase activity	0.003%		NaN	0.87	0.12	MF
+GO:0030410	nicotianamine synthase activity	0.003%		NaN	0.88	0.13	MF
+GO:0003975	UDP-N-acetylglucosamine-dolichyl-phosphate N-acetylglucosaminephosphotransferase activity	0.006%		NaN	0.87	0.13	MF
+GO:0003956	NAD(P)+-protein-arginine ADP-ribosyltransferase activity	0.006%		NaN	0.87	0.13	MF
+GO:0004334	fumarylacetoacetase activity	0.014%		NaN	0.92	0.14	MF
+GO:0050126	N-carbamoylputrescine amidase activity	0.004%		NaN	0.91	0.14	MF
+GO:0047389	glycerophosphocholine phosphodiesterase activity	0.004%		NaN	0.90	0.14	MF
+GO:0008661	1-deoxy-D-xylulose-5-phosphate synthase activity	0.032%		NaN	0.88	0.14	MF
+GO:0032422	purine-rich negative regulatory element binding	0.007%		NaN	0.99	0.14	MF
+GO:0019784	NEDD8-specific protease activity	0.007%		NaN	0.89	0.14	MF
+GO:0009882	blue light photoreceptor activity	0.009%		NaN	0.98	0.15	MF
+GO:0004013	adenosylhomocysteinase activity	0.030%		NaN	0.92	0.16	MF
+GO:0005458	GDP-mannose transmembrane transporter activity	0.004%		NaN	0.96	0.16	MF
+GO:0016166	phytoene dehydrogenase activity	0.001%		NaN	0.91	0.17	MF
+GO:0016719	carotene 7,8-desaturase activity	0.001%		NaN	0.91	0.17	MF
+GO:0010349	L-galactose dehydrogenase activity	0.002%		NaN	0.91	0.17	MF
+GO:0008483	transaminase activity	0.735%		NaN	0.85	0.18	MF
+GO:0004322	ferroxidase activity	0.021%		NaN	0.91	0.19	MF
+GO:0010308	acireductone dioxygenase (Ni2+-requiring) activity	0.004%		NaN	0.91	0.19	MF
+GO:0001735	prenylcysteine oxidase activity	0.006%		NaN	0.91	0.20	MF
+GO:0035438	cyclic-di-GMP binding	0.048%		NaN	0.99	0.21	MF
+GO:0003884	D-amino-acid oxidase activity	0.018%		NaN	0.90	0.21	MF
+GO:0003885	D-arabinono-1,4-lactone oxidase activity	0.018%		NaN	0.89	0.21	MF
+GO:0042834	peptidoglycan binding	0.058%		NaN	0.99	0.21	MF
+GO:0004324	ferredoxin-NADP+ reductase activity	0.024%		NaN	0.91	0.21	MF
+GO:0046429	4-hydroxy-3-methylbut-2-en-1-yl diphosphate synthase activity	0.026%		NaN	0.90	0.22	MF
+GO:0003942	N-acetyl-gamma-glutamyl-phosphate reductase activity	0.029%		NaN	0.90	0.22	MF
+GO:0019789	SUMO transferase activity	0.018%		NaN	0.85	0.22	MF
+GO:0046522	S-methyl-5-thioribose kinase activity	0.003%		NaN	0.86	0.23	MF
+GO:0004602	glutathione peroxidase activity	0.043%		NaN	0.89	0.23	MF
+GO:0003877	ATP adenylyltransferase activity	0.005%		NaN	0.86	0.23	MF
+GO:0008381	mechanosensitive ion channel activity	0.036%		NaN	0.94	0.24	MF
+GO:0050242	pyruvate, phosphate dikinase activity	0.017%		NaN	0.86	0.25	MF
+GO:0004788	thiamine diphosphokinase activity	0.019%		NaN	0.86	0.26	MF
+GO:0008772	[isocitrate dehydrogenase (NADP+)] kinase activity	0.003%		NaN	0.83	0.28	MF
+GO:0004349	glutamate 5-kinase activity	0.030%		NaN	0.84	0.29	MF
+GO:0018738	S-formylglutathione hydrolase activity	0.014%		NaN	0.90	0.30	MF
+GO:0042134	rRNA primary transcript binding	0.013%		NaN	0.99	0.30	MF
+GO:0015204	urea transmembrane transporter activity	0.013%		NaN	0.95	0.31	MF
+GO:0043743	LPPG:FO 2-phospho-L-lactate transferase activity	0.020%		NaN	0.85	0.31	MF
+GO:0009030	thiamine-phosphate kinase activity	0.020%		NaN	0.84	0.32	MF
+GO:0047918	GDP-mannose 3,5-epimerase activity	0.001%		NaN	0.93	0.32	MF
+GO:0005548	phospholipid transporter activity	0.036%		NaN	0.95	0.32	MF
+GO:0035299	inositol pentakisphosphate 2-kinase activity	0.005%		NaN	0.85	0.32	MF
+GO:0047325	inositol tetrakisphosphate 1-kinase activity	0.006%		NaN	0.85	0.32	MF
+GO:0052726	inositol-1,3,4-trisphosphate 5-kinase activity	0.006%		NaN	0.85	0.32	MF
+GO:0008974	phosphoribulokinase activity	0.006%		NaN	0.85	0.32	MF
+GO:0004001	adenosine kinase activity	0.007%		NaN	0.82	0.32	MF
+GO:0003847	1-alkyl-2-acetylglycerophosphocholine esterase activity	0.018%		NaN	0.90	0.32	MF
+GO:0015297	antiporter activity	0.444%		NaN	0.94	0.33	MF
+GO:0004496	mevalonate kinase activity	0.010%		NaN	0.85	0.33	MF
+GO:0097602	cullin family protein binding	0.017%		NaN	0.99	0.33	MF
+GO:0004379	glycylpeptide N-tetradecanoyltransferase activity	0.008%		NaN	0.87	0.33	MF
+GO:0050220	prostaglandin-E synthase activity	0.003%		NaN	0.93	0.33	MF
+GO:0009029	tetraacyldisaccharide 4'-kinase activity	0.014%		NaN	0.84	0.34	MF
+GO:0008478	pyridoxal kinase activity	0.014%		NaN	0.84	0.34	MF
+GO:0003873	6-phosphofructo-2-kinase activity	0.015%		NaN	0.83	0.34	MF
+GO:0016756	glutathione gamma-glutamylcysteinyltransferase activity	0.004%		NaN	0.86	0.34	MF
+GO:0008803	bis(5'-nucleosyl)-tetraphosphatase (symmetrical) activity	0.006%		NaN	0.92	0.34	MF
+GO:0051879	Hsp90 protein binding	0.020%		NaN	0.99	0.34	MF
+GO:0036374	glutathione hydrolase activity	0.034%		NaN	0.88	0.35	MF
+GO:0003747	translation release factor activity	0.117%		NaN	0.90	0.35	MF
+GO:0048487	beta-tubulin binding	0.018%		NaN	0.99	0.35	MF
+GO:0004020	adenylylsulfate kinase activity	0.027%		NaN	0.84	0.35	MF
+GO:0047151	methylenetetrahydrofolate-tRNA-(uracil-5-)-methyltransferase (FADH2-oxidizing) activity	0.009%		NaN	0.87	0.35	MF
+GO:0019905	syntaxin binding	0.025%		NaN	0.99	0.35	MF
+GO:0050080	malonyl-CoA decarboxylase activity	0.005%		NaN	0.91	0.35	MF
+GO:0047727	isobutyryl-CoA mutase activity	0.005%		NaN	0.92	0.35	MF
+GO:0030729	acetoacetate-CoA ligase activity	0.013%		NaN	0.91	0.36	MF
+GO:0008409	5'-3' exonuclease activity	0.076%		NaN	0.85	0.36	MF
+GO:0004143	diacylglycerol kinase activity	0.033%		NaN	0.84	0.36	MF
+GO:0015232	heme transmembrane transporter activity	0.052%		NaN	0.94	0.36	MF
+GO:0018822	nitrile hydratase activity	0.008%		NaN	0.91	0.36	MF
+GO:0004712	protein serine/threonine/tyrosine kinase activity	0.031%		NaN	0.81	0.36	MF
+GO:0004370	glycerol kinase activity	0.034%		NaN	0.84	0.36	MF
+GO:0004140	dephospho-CoA kinase activity	0.034%		NaN	0.84	0.37	MF
+GO:0008531	riboflavin kinase activity	0.035%		NaN	0.84	0.37	MF
+GO:0004371	glycerone kinase activity	0.041%		NaN	0.83	0.37	MF
+GO:0004329	formate-tetrahydrofolate ligase activity	0.019%		NaN	0.90	0.37	MF
+GO:0004397	histidine ammonia-lyase activity	0.015%		NaN	0.91	0.37	MF
+GO:0004594	pantothenate kinase activity	0.042%		NaN	0.83	0.37	MF
+GO:0047150	betaine-homocysteine S-methyltransferase activity	0.011%		NaN	0.87	0.38	MF
+GO:0033925	mannosyl-glycoprotein endo-beta-N-acetylglucosaminidase activity	0.006%		NaN	0.91	0.38	MF
+GO:0003825	alpha,alpha-trehalose-phosphate synthase (UDP-forming) activity	0.008%		NaN	0.87	0.38	MF
+GO:0004819	glutamine-tRNA ligase activity	0.019%		NaN	0.84	0.38	MF
+GO:0017110	nucleoside-diphosphatase activity	0.011%		NaN	0.92	0.38	MF
+GO:0004366	glycerol-3-phosphate O-acyltransferase activity	0.008%		NaN	0.87	0.39	MF
+GO:0051087	chaperone binding	0.104%		NaN	0.99	0.39	MF
+GO:0004462	lactoylglutathione lyase activity	0.031%		NaN	0.91	0.39	MF
+GO:0016805	dipeptidase activity	0.073%		NaN	0.87	0.40	MF
+GO:0015159	polysaccharide transmembrane transporter activity	0.032%		NaN	0.95	0.40	MF
+GO:0004799	thymidylate synthase activity	0.028%		NaN	0.86	0.40	MF
+GO:0048529	magnesium-protoporphyrin IX monomethyl ester (oxidative) cyclase activity	0.003%		NaN	0.91	0.	MF
+GO:0003951	NAD+ kinase activity	0.122%		NaN	0.82	0.40	MF
+GO:0004484	mRNA guanylyltransferase activity	0.007%		NaN	0.86	0.40	MF
+GO:0004707	MAP kinase activity	0.038%		NaN	0.79	0.41	MF
+GO:0004325	ferrochelatase activity	0.049%		NaN	0.91	0.41	MF
+GO:0008373	sialyltransferase activity	0.026%		NaN	0.84	0.41	MF
+GO:0004038	allantoinase activity	0.009%		NaN	0.90	0.41	MF
+GO:0004149	dihydrolipoyllysine-residue succinyltransferase activity	0.025%		NaN	0.85	0.41	MF
+GO:0003864	3-methyl-2-oxobutanoate hydroxymethyltransferase activity	0.027%		NaN	0.86	0.41	MF
+GO:0043874	acireductone synthase activity	0.006%		NaN	0.87	0.41	MF
+GO:0004070	aspartate carbamoyltransferase activity	0.033%		NaN	0.86	0.42	MF
+GO:0004636	phosphoribosyl-ATP diphosphatase activity	0.027%		NaN	0.91	0.42	MF
+GO:0016630	protochlorophyllide reductase activity	0.002%		NaN	0.91	0.42	MF
+GO:0017116	single-stranded DNA helicase activity	0.014%		NaN	0.88	0.42	MF
+GO:0003989	acetyl-CoA carboxylase activity	0.110%		NaN	0.90	0.42	MF
+GO:0004743	pyruvate kinase activity	0.051%		NaN	0.80	0.42	MF
+GO:0016161	beta-amylase activity	0.007%		NaN	0.91	0.42	MF
+GO:0004047	aminomethyltransferase activity	0.029%		NaN	0.86	0.42	MF
+GO:0008690	3-deoxy-manno-octulosonate cytidylyltransferase activity	0.016%		NaN	0.85	0.43	MF
+GO:0004768	stearoyl-CoA 9-desaturase activity	0.007%		NaN	0.91	0.43	MF
+GO:0003998	acylphosphatase activity	0.028%		NaN	0.91	0.44	MF
+GO:0016987	sigma factor activity	0.461%		NaN	0.98	0.44	MF
+GO:0033819	lipoyl(octanoyl) transferase activity	0.026%		NaN	0.85	0.44	MF
+GO:0004449	isocitrate dehydrogenase (NAD+) activity	0.013%		NaN	0.89	0.44	MF
+GO:0019135	deoxyhypusine monooxygenase activity	0.005%		NaN	0.88	0.44	MF
+GO:0008961	phosphatidylglycerol-prolipoprotein diacylglyceryl transferase activity	0.033%		NaN	0.84	0.44	MF
+GO:0031267	small GTPase binding	0.163%		NaN	0.99	0.45	MF
+GO:0050380	undecaprenyl-diphosphatase activity	0.033%		NaN	0.91	0.45	MF
+GO:0004668	protein-arginine deiminase activity	0.018%		NaN	0.90	0.45	MF
+GO:0004500	dopamine beta-monooxygenase activity	0.006%		NaN	0.91	0.45	MF
+GO:0003876	AMP deaminase activity	0.009%		NaN	0.90	0.45	MF
+GO:0030337	DNA polymerase processivity factor activity	0.009%		NaN	0.98	0.45	MF
+GO:0004555	alpha,alpha-trehalase activity	0.018%		NaN	0.91	0.45	MF
+GO:0004170	dUTP diphosphatase activity	0.033%		NaN	0.91	0.45	MF
+GO:0004164	diphthine synthase activity	0.007%		NaN	0.87	0.45	MF
+GO:0008725	DNA-3-methyladenine glycosylase activity	0.029%		NaN	0.84	0.45	MF
+GO:0004459	L-lactate dehydrogenase activity	0.016%		NaN	0.89	0.46	MF
+GO:0003865	3-oxo-5-alpha-steroid 4-dehydrogenase activity	0.008%		NaN	0.90	0.46	MF
+GO:0008879	glucose-1-phosphate thymidylyltransferase activity	0.024%		NaN	0.85	0.46	MF
+GO:0000213	tRNA-intron endonuclease activity	0.011%		NaN	0.81	0.46	MF
+GO:0008108	UDP-glucose:hexose-1-phosphate uridylyltransferase activity	0.017%		NaN	0.85	0.46	MF
+GO:0004420	hydroxymethylglutaryl-CoA reductase (NADPH) activity	0.016%		NaN	0.89	0.46	MF
+GO:0042162	telomeric DNA binding	0.036%		NaN	0.99	0.46	MF
+GO:0004190	aspartic-type endopeptidase activity	0.273%		NaN	0.86	0.46	MF
+GO:0003917	DNA topoisomerase type I (single strand cut, ATP-independent) activity	0.069%		NaN	0.84	0.46	MF
+GO:0009022	tRNA nucleotidyltransferase activity	0.019%		NaN	0.78	0.46	MF
+GO:0003714	transcription corepressor activity	0.084%		NaN	0.98	0.47	MF
+GO:0004310	farnesyl-diphosphate farnesyltransferase activity	0.006%		NaN	0.88	0.47	MF
+GO:0008441	3'(2'),5'-bisphosphate nucleotidase activity	0.015%		NaN	0.86	0.47	MF
+GO:0004427	inorganic diphosphatase activity	0.063%		NaN	0.91	0.47	MF
+GO:0004573	mannosyl-oligosaccharide glucosidase activity	0.016%		NaN	0.91	0.47	MF
+GO:0004392	heme oxygenase (decyclizing) activity	0.014%		NaN	0.90	0.47	MF
+GO:0030604	1-deoxy-D-xylulose-5-phosphate reductoisomerase activity	0.025%		NaN	0.89	0.47	MF
+GO:0016742	hydroxymethyl-, formyl- and related transferase activity	0.216%		NaN	0.85	0.48	MF
+GO:0046421	methylisocitrate lyase activity	0.012%		NaN	0.90	0.48	MF
+GO:0004654	polyribonucleotide nucleotidyltransferase activity	0.030%		NaN	0.85	0.48	MF
+GO:0004368	glycerol-3-phosphate dehydrogenase (quinone) activity	0.035%		NaN	0.89	0.48	MF
+GO:0003968	RNA-directed 5'-3' RNA polymerase activity	0.031%		NaN	0.76	0.48	MF
+GO:0004046	aminoacylase activity	0.005%		NaN	0.90	0.49	MF
+GO:0000156	phosphorelay response regulator activity	0.054%		NaN	0.98	0.49	MF
+GO:0008762	UDP-N-acetylmuramate dehydrogenase activity	0.028%		NaN	0.89	0.49	MF
+GO:0000774	adenyl-nucleotide exchange factor activity	0.044%		NaN	0.98	0.49	MF
+GO:0004455	ketol-acid reductoisomerase activity	0.029%		NaN	0.89	0.49	MF
+GO:0003862	3-isopropylmalate dehydrogenase activity	0.029%		NaN	0.89	0.50	MF
+GO:0019134	glucosamine-1-phosphate N-acetyltransferase activity	0.022%		NaN	0.87	0.50	MF
+GO:0004617	phosphoglycerate dehydrogenase activity	0.031%		NaN	0.89	0.50	MF
+GO:0006368	transcription elongation from RNA polymerase II promoter	0.052%		NaN	1.00	0.00	BP
+GO:0005874	microtubule	0.591%		NaN	0.74	0.00	CC
+GO:0042555	MCM complex	0.052%		NaN	0.74	0.00	CC
+GO:0005886	plasma membrane	15.506%		NaN	0.98	0.00	CC
+GO:0030173	integral component of Golgi membrane	0.048%		NaN	0.72	0.16	CC
+GO:0031083	BLOC-1 complex	0.016%		NaN	0.64	0.23	CC
+GO:0030532	small nuclear ribonucleoprotein complex	0.138%		NaN	0.57	0.26	CC
+GO:0008250	oligosaccharyltransferase complex	0.039%		NaN	0.60	0.39	CC

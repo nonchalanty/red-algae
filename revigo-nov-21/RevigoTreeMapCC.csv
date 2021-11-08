@@ -1,0 +1,12 @@
+% WARNING - This exported Revigo data is only useful for the specific purpose of constructing a TreeMap visualization.
+% Do not use this table as a general list of non-redundant GO categories, as it sets an extremely permissive 
+% threshold to detect redundancies (c=0.10) and fill the 'representative' column, while normally c>=0.4 is recommended.
+% To export a reduced-redundancy set of GO terms, go to the Scatterplot & Table tab, and export to CSV from there.
+TermID, Name, Frequency, Value, Uniqueness, Dispensability, Representative
+"GO:0005874", "microtubule", 0.590923058896654, NaN, 0.743307611944267, 0, null
+"GO:0030173", "integral component of Golgi membrane", 0.0482779463204013, NaN, 0.720783016873817, 0.16417986, "microtubule"
+"GO:0008250", "oligosaccharyltransferase complex", 0.0394539627330108, NaN, 0.602647357590838, 0.39260902, "microtubule"
+"GO:0042555", "MCM complex", 0.0516392267501353, NaN, 0.736867388621876, 0, null
+"GO:0031083", "BLOC-1 complex", 0.0157955281823943, NaN, 0.638408624494431, 0.22740185, "MCM complex"
+"GO:0030532", "small nuclear ribonucleoprotein complex", 0.138166054523554, NaN, 0.571526896999077, 0.2622474, "MCM complex"
+"GO:0005886", "plasma membrane", 15.5064680247866, NaN, 0.980465972776413, 4.124E-05, null

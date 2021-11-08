@@ -1,0 +1,6 @@
+% WARNING - This exported Revigo data is only useful for the specific purpose of constructing a TreeMap visualization.
+% Do not use this table as a general list of non-redundant GO categories, as it sets an extremely permissive 
+% threshold to detect redundancies (c=0.10) and fill the 'representative' column, while normally c>=0.4 is recommended.
+% To export a reduced-redundancy set of GO terms, go to the Scatterplot & Table tab, and export to CSV from there.
+TermID, Name, Frequency, Value, Uniqueness, Dispensability, Representative
+"GO:0006368", "transcription elongation from RNA polymerase II promoter", 0.0522663167319792, NaN, 1, 0, null
