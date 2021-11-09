@@ -29,7 +29,8 @@
     <div class="navbar-brand">
         <a class="navbar-item" href="http://52.90.88.45:1337/index.html">
             <img src="./seaweed.png">
-            <span class="is-medium font" style="padding-left: 2em; padding-right: 2em">K. alvarezii Genome Explorer</span>
+            <span class="is-medium font"
+                  style="padding-left: 2em; padding-right: 2em">K. alvarezii Genome Explorer</span>
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -66,6 +67,9 @@
                     </a>
                     <a href="http://52.90.88.45:1337/statistics.html" class="navbar-item">
                         Statistics
+                    </a>
+                    <a href="http://52.90.88.45:1337/Ontologies.html" class="navbar-item">
+                        Gene Ontology
                     </a>
                 </div>
             </div>
@@ -142,7 +146,8 @@
             <h2 class="subtitle">
                 For more information about the genome assembly, and to cite this resource,
                 consult the following:<br>
-                <a href="https://www.biorxiv.org/content/10.1101/2020.02.15.950402v1.full" style="font-style:italic;color: #3673ed; text-decoration: underline">
+                <a href="https://www.biorxiv.org/content/10.1101/2020.02.15.950402v1.full"
+                   style="font-style:italic;color: #3673ed; text-decoration: underline">
                     High-quality de novo genome assembly of Kappaphycus alvarezii based on both PacBio and HiSeq
                     sequencing
                     (Jia et al., 2020)
@@ -158,15 +163,15 @@
         At present, the portal includes the following features:
     </h2>
 </section>
-    <div class="columns">
-        <div class="column is-3">
-        </div>
-        <div class="column is-6">
-    <hr>
-        </div>
-        <div class="column is-3">
-        </div>
+<div class="columns">
+    <div class="column is-3">
     </div>
+    <div class="column is-6">
+        <hr>
+    </div>
+    <div class="column is-3">
+    </div>
+</div>
 
 <section>
     <div class="columns">
@@ -179,14 +184,14 @@
         </div>
         <div class="column">
             <div class="container" style="padding-left: 2em; padding-right: 2em">
-            <h1 class="title is-4">Interactive Genome Browser</h1>
-            <h2 class="subtitle is-6">
-                Navigate the complete genome sequence, down to the base pair level.
-                Copy and compare sequences of interest.
-                Optionally select from an array of annotation and alignment tracks.
-            </h2>
+                <h1 class="title is-4">Interactive Genome Browser</h1>
+                <h2 class="subtitle is-6">
+                    Navigate the complete genome sequence, down to the base pair level.
+                    Copy and compare sequences of interest.
+                    Optionally select from an array of annotation and alignment tracks.
+                </h2>
                 <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii">
-                  <button class="button is-primary is-large">Go to Genome Browser</button>
+                    <button class="button is-primary is-large">Go to Genome Browser</button>
                 </a>
             </div>
         </div>
@@ -195,7 +200,7 @@
         <div class="column is-3">
         </div>
         <div class="column is-6">
-    <hr>
+            <hr>
         </div>
         <div class="column is-3">
         </div>
@@ -203,20 +208,20 @@
     <div class="columns">
         <div class="column">
             <div class="container has-text-right" style="padding-left: 2em; padding-right: 2em">
-            <h1 class="title is-4">Rich Feature Annotations</h1>
-            <h2 class="subtitle is-6">
-                Explore <i>in silico</i> predicted genes and transcripts, alongside
-                their functional annotations. This includes functional gene ontologies
-                as well as pathway annotations by Reactome, MetaCyc and others.
-                Search and navigate between these using the search bar and typing for
-                a pathway ID, GO term or other annotation of interest.
-            </h2>
+                <h1 class="title is-4">Rich Feature Annotations</h1>
+                <h2 class="subtitle is-6">
+                    Explore <i>in silico</i> predicted genes and transcripts, alongside
+                    their functional annotations. This includes functional gene ontologies
+                    as well as pathway annotations by Reactome, MetaCyc and others.
+                    Search and navigate between these using the search bar and typing for
+                    a pathway ID, GO term or other annotation of interest.
+                </h2>
                 <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii&loc=NADL03000001.1%3A931293..994042&tracks=DNA%2CGene%20functional%20annotations%20-%2020k%20rows%20(added%20by%20script%20to%20K.%20alva%20subdir%20of%20data)%2CPredicted%20genes%20(annotated%20as%20GTF)%20%5Bfeature%20format%5D&highlight=">
-                  <button class="button is-primary is-large">View Annotations in Genome Browser</button>
+                    <button class="button is-primary is-large">View Annotations in Genome Browser</button>
                 </a>
             </div>
         </div>
-                <div class="column is-8">
+        <div class="column is-8">
             <div class="container" style="padding-left: 2em; padding-right: 2em">
                 <figure class="image is-5by3" style="margin: auto; ">
                     <img src="./annotations-revd.png">
@@ -228,7 +233,7 @@
         <div class="column is-3">
         </div>
         <div class="column is-6">
-    <hr>
+            <hr>
         </div>
         <div class="column is-3">
         </div>
@@ -243,20 +248,20 @@
         </div>
         <div class="column">
             <div class="container" style="padding-left: 2em; padding-right: 2em">
-            <h1 class="title is-4">On-the-fly Blast Functionality</h1>
-            <h2 class="subtitle is-6">
-                Perform Blastn/Blastx searches to aid in evofunctional discovery.
-                Blast searches can be performed directly in the browser by highlighting a sequence of interest
-                and then viewing the results as annotation tracks.
-                Result tracks can be toggled on or off, and "hits" filtered by E-score and other
-                parameters. Blast searches can be performed against both the small, example <i>faux</i>
-                database, as well as the complete JGI Phycocosm (algal) blast database and others.
-                Arbitrary sequences can also be pasted and used in blast searches.
-            </h2>
+                <h1 class="title is-4">On-the-fly Blast Functionality</h1>
+                <h2 class="subtitle is-6">
+                    Perform Blastn/Blastx searches to aid in evofunctional discovery.
+                    Blast searches can be performed directly in the browser by highlighting a sequence of interest
+                    and then viewing the results as annotation tracks.
+                    Result tracks can be toggled on or off, and "hits" filtered by E-score and other
+                    parameters. Blast searches can be performed against both the small, example <i>faux</i>
+                    database, as well as the complete JGI Phycocosm (algal) blast database and others.
+                    Arbitrary sequences can also be pasted and used in blast searches.
+                </h2>
                 <h2 class="subtitle is-6"><b>Note:</b> currently, users must be logged in to access blast functionality.
                     Guest users can explore this functionality using the username "user" and password "password".</h2>
                 <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii&loc=NADL03000002.1%3A1398701..1522200&tracks=DNA%2CGene%20functional%20annotations%20-%2020k%20rows%20(added%20by%20script%20to%20K.%20alva%20subdir%20of%20data)%2CPredicted%20genes%20(annotated%20as%20GTF)%20%5Bfeature%20format%5D&highlight=NADL03000002.1%3A1456200..1464999">
-                  <button class="button is-primary is-large">Perform Blast Search</button>
+                    <button class="button is-primary is-large">Perform Blast Search</button>
                 </a>
             </div>
         </div>
