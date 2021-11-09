@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;1,100;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+        .font {
+            font-family: "Nunito", sans-serif;
+        }
+
+        .font2 {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .font3 {
+            font-family: 'Lato', sans-serif;
+        }
+
+        #tab-content > div {
+            display: none;
+        }
+
+        #tab-content > div.is-active {
+            display: block;
+        }
+
+        #tab-content-submenu-1 > div {
+            display: none;
+        }
+
+        #tab-content-submenu-1 > div.is-active {
+            display: block;
+        }
+
+        #tab-content-submenu-2 > div {
+            display: none;
+        }
+
+        #tab-content-submenu-2 > div.is-active {
+            display: block;
+        }
+
+        #tab-content-submenu-3 > div {
+            display: none;
+        }
+
+        #tab-content-submenu-3 > div.is-active {
+            display: block;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var iframe5Clicked = false
+            var iframe6Clicked = false
+
+
+            $('li[data-tab="5"]').on('click', function () {
+                if (!iframe5Clicked) {
+                    setTimeout(function () {
+
+                        // NB fix for plotly graph displaying incorrectly (squashed text)
+                        // It works the same as right clicking on the iframe -> reload iframe
+                        // Not sure why that is the fix but the hack works.
+                        $('#annoying-iframe-5').attr('src', function (i, val) {
+                            return val;
+                        });
+
+                        // Set to true to make this happen on first load only
+                        iframe5Clicked = true
+                    }, 300);
+
+                }
+            });
+            $('li[data-tab="6"]').on('click', function () {
+                if (!iframe6Clicked) {
+                    setTimeout(function () {
+
+                        // NB fix for plotly graph displaying incorrectly (squashed text)
+                        // It works the same as right clicking on the iframe -> reload iframe
+                        // Not sure why that is the fix but the hack works.
+                        $('#annoying-iframe-6').attr('src', function (i, val) {
+                            return val;
+                        });
+
+                        // Set to true to make this happen on first load only
+                        iframe6Clicked = true
+                    }, 300);
+
+                }
+            });
+
+
+            $('#tabs li').on('click', function () {
+                var tab = $(this).data('tab');
+
+                $('#tabs li').removeClass('is-active');
+                $(this).addClass('is-active');
+
+                $('#tab-content > div').removeClass('is-active');
+                $('div[data-content="' + tab + '"]').addClass('is-active');
+            });
+
+            $('#tabs-submenu-1 li').on('click', function () {
+                var tab = $(this).data('tab');
+
+                $('#tabs-submenu-1 li').removeClass('is-active');
+                $(this).addClass('is-active');
+
+                $('#tab-content-submenu-1 div').removeClass('is-active');
+                $('div[data-content="' + tab + '"]').addClass('is-active');
+            });
+
+            $('#tabs-submenu-2 li').on('click', function () {
+                var tab = $(this).data('tab');
+
+                $('#tabs-submenu-2 li').removeClass('is-active');
+                $(this).addClass('is-active');
+
+                $('#tab-content-submenu-2 div').removeClass('is-active');
+                $('div[data-content="' + tab + '"]').addClass('is-active');
+            });
+
+            $('#tabs-submenu-3 li').on('click', function () {
+                var tab = $(this).data('tab');
+
+                $('#tabs-submenu-3 li').removeClass('is-active');
+                $(this).addClass('is-active');
+
+                $('#tab-content-submenu-3 div').removeClass('is-active');
+                $('div[data-content="' + tab + '"]').addClass('is-active');
+            });
+
+        });
+    </script>
+</head>
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="http://52.90.88.45:1337/index.html">
+            <img src="./seaweed.png">
+            <span class="is-medium font"
+                  style="padding-left: 2em; padding-right: 2em">K. alvarezii Genome Explorer</span>
+
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a href="http://52.90.88.45:1337/index.html" class="navbar-item">
+                Home
+            </a>
+
+            <a class="navbar-item">
+                Documentation
+            </a>
+            <a class="navbar-item">
+                About
+            </a>
+
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    Tools
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a href="http://52.90.88.45:1337/jbrowse/?data=data%2FKappaphycus_alvarezii" class="navbar-item">
+                        Genome Browser
+                    </a>
+                    <a href="http://52.90.88.45:4567/" class="navbar-item">
+                        Blast against K. alvarezii
+                    </a>
+                    <a href="http://52.90.88.45:1337/statistics.html" class="navbar-item">
+                        Statistics
+                    </a>
+                    <a href="http://52.90.88.45:1337/Ontologies.html" class="navbar-item">
+                        Gene Ontology
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary">
+                        <strong>Sign up</strong>
+                    </a>
+                    <a class="button is-light">
+                        Log in
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="hero is-medium is-warning">
+    <!-- Hero head: will stick at the top -->
+    <div class="hero-head">
+    </div>
+
+    <!-- Hero content: will be in the middle -->
+    <div class="hero-body">
+        <div class="container has-text-center">
+            <p class="title is-2 is-spaced font">
+                Gene Ontology
+            </p>
+            <h2 class="subtitle">
+                Explore an overview of non-redundant GO terms and descriptors for <i>K. alvarezii</i>.<br>
+                All graphs below were generated using the raw results of <a href="http://revigo.irb.hr/">REViGO</a>
+                analysis using the complete list of
+                GO terms derived during gene/protein annotation for the <i>K. alvarezii</i> genome assembly.
+                The complete list of input and output GO terms can be made available upon request.
+            </h2>
+        </div>
+    </div>
+</section>
+
+<div class="columns">
+    <div class="column is-12" style=""></div>
+</div>
+<div class="columns">
+    <div class="column is-12" style=""></div>
+</div>
+<div class="columns">
+    <div class="column is-12" style=""></div>
+</div>
+
+<div class="columns">
+    <div class="column is-1"></div>
+    <div class="column is-10">
+
+        <div class="tabs is-toggle is-fullwidth" id="tabs">
+            <ul>
+                <li class="is-active" data-tab="1">
+                    <a>
+                        <span class="is-small"></span>
+                        <span>Molecular function</span>
+                    </a>
+                </li>
+                <li data-tab="2">
+                    <a>
+                        <span class=" is-small"></span>
+                        <span>Cellular component</span>
+                    </a>
+                </li>
+                <li data-tab="3">
+                    <a>
+                        <span class=" is-small"></span>
+                        <span>Biological pathway</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div id="tab-content">
+            <div class="is-active" data-content="1">
+
+                <div class="tabs is-boxed" id="tabs-submenu-1">
+                    <ul>
+                        <li class="is-active" data-tab="4">
+                            <a>
+                                <span class="is-small"></span>
+                                <span>Multidimensional scaling</span>
+                            </a>
+                        </li>
+                        <li data-tab="5">
+                            <a>
+                                <span class=" is-small"></span>
+                                <span>Treemap</span>
+                            </a>
+                        </li>
+                        <li data-tab="6">
+                            <a>
+                                <span class=" is-small"></span>
+                                <span>Sunburst</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="tab-content-submenu-1">
+                    <div class="is-active" data-content="4">
+                        <div class="columns">
+                            <div class="column is-1"></div>
+                            <div class="column is-10">
+                                <iframe width="100%" height="800px"
+                                        src="../revigo-nov-21/output-plots/Revigo-PCA-MF.html"
+                                        title="REViGO MDS MF">
+                                </iframe>
+                            </div>
+                            <div class="column is-1"></div>
+                        </div>
+                    </div>
+                        <!--                    old "fix" for plotly squashed text in iframe. Cause other problems though with tabs hiding/showing-->
+                        <!--                    <div data-content="5" style="display:block">-->
+                        <div data-content="5">
+                            <iframe id="annoying-iframe-5" width="100%" height="800px"
+                                    style="display:block;min-height:800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-treemap-MF.html"
+                                    title="REViGO treemap MF">
+                            </iframe>
+                        </div>
+                        <div data-content="6">
+                            <iframe id="annoying-iframe-6" width="100%" height="800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-sunburst-MF.html"
+                                    title="REViGO sunburst MF">
+                            </iframe>
+                        </div>
+                    </div>
+
+                </div>
+                <div data-content="2">
+                    <div class="tabs is-boxed" id="tabs-submenu-2">
+                        <ul>
+                            <li class="is-active" data-tab="7">
+                                <a>
+                                    <span class="is-small"></span>
+                                    <span>Multidimensional scaling</span>
+                                </a>
+                            </li>
+                            <li data-tab="8">
+                                <a>
+                                    <span class=" is-small"></span>
+                                    <span>Treemap</span>
+                                </a>
+                            </li>
+                            <li data-tab="9">
+                                <a>
+                                    <span class=" is-small"></span>
+                                    <span>Sunburst</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="tab-content-submenu-2">
+                        <div class="is-active" data-content="7">
+                        <div class="columns">
+                            <div class="column is-1"></div>
+                            <div class="column is-10">
+                                <iframe width="100%" height="800px"
+                                        src="../revigo-nov-21/output-plots/Revigo-PCA-CC.html"
+                                        title="REViGO MDS CC">
+                                </iframe>
+                            </div>
+                            <div class="column is-1"></div>
+                        </div>
+                        </div>
+                        <div data-content="8">
+                            <iframe width="100%" height="800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-treemap-CC.html"
+                                    title="REViGO treemap CC">
+                            </iframe>
+                        </div>
+                        <div data-content="9">
+                            <iframe width="100%" height="800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-sunburst-CC.html"
+                                    title="REViGO sunburst CC">
+                            </iframe>
+                        </div>
+                    </div>
+
+                </div>
+                <div data-content="3">
+                    <div class="tabs is-boxed" id="tabs-submenu-3">
+                        <ul>
+                            <li class="is-active" data-tab="10">
+                                <a>
+                                    <span class="is-small"></span>
+                                    <span>Multidimensional scaling</span>
+                                </a>
+                            </li>
+                            <li data-tab="11">
+                                <a>
+                                    <span class=" is-small"></span>
+                                    <span>Treemap</span>
+                                </a>
+                            </li>
+                            <li data-tab="12">
+                                <a>
+                                    <span class=" is-small"></span>
+                                    <span>Sunburst</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="tab-content-submenu-3">
+                        <div class="is-active" data-content="10">
+                        <div class="columns">
+                            <div class="column is-1"></div>
+                            <div class="column is-10">
+                                <iframe width="100%" height="800px"
+                                        src="../revigo-nov-21/output-plots/Revigo-PCA-BP.html"
+                                        title="REViGO MDS BP">
+                                </iframe>
+                            </div>
+                            <div class="column is-1"></div>
+                        </div>
+                        </div>
+                        <div data-content="11">
+                            <iframe width="100%" height="800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-treemap-BP.html"
+                                    title="REViGO treemap BP">
+                            </iframe>
+                        </div>
+                        <div data-content="12">
+                            <iframe width="100%" height="800px"
+                                    src="../revigo-nov-21/output-plots/Revigo-sunburst-BP.html"
+                                    title="REViGO sunburst BP">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="column is-1"></div>
+    </div>
+
+</body>
+</html>
