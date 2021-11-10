@@ -1,4 +1,16 @@
-# Steps to start jbconect server
+# README
+
+This is a rough, work in progress document to help the developer 
+to better keep track of important steps performed. It is not comprehensive
+so some interpretation will sometimes be required 
+(for example, making logical decisions about which directory to execute the 
+cmds from). This document is not meant to be neat!
+
+---
+
+
+## Steps to start jbconect server
+
 The steps werent recorded here but a few rough documents I made outline the installation steps ("working-cmds-.....txt")
 But some other useful things to note for future:
 
@@ -7,7 +19,9 @@ But some other useful things to note for future:
 
 
 ------------------------------------------------------------------------------------------
-# Steps taken to download and install pathway tools (rough copy paste of most of the cmds)
+## Steps taken to download and install pathway tools (rough copy paste of most of the cmds)
+ 
+ ```
  1004  mkdir p-tools
  1005  chmod a+rw p-tools/
  1006  cd p-tools/
@@ -33,10 +47,14 @@ But some other useful things to note for future:
  1026  cd /large-store/
  1027  ls
  1028  cd p-tools/
+```
 
+```
 chmod u+x pathway-tools-25.0-linux-64-tier1-install
+```
 
 To allow x11 forwarding:
+```
 sudo yum install xorg-x11-xauth
 
 sudo yum install gnome-terminal
@@ -47,17 +65,20 @@ tmux a -t ptools
  mkdir data
 
 ./pathway-tools-25.0-linux-64-tier1-install
+```
 
- Review settings before copying files
+Review settings before copying files
 
+```
 Install Directory:
       /large-store/p-tools/pathway-tools
 
       Pathway Tools Configuration and Data Directory:
       /large-store/p-tools/data/ptools-local
 
-
+```
 then run the software (doesnt work, throws errors):
+```
 ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
 
 Some errors (slightly different after conda deactivating):
@@ -83,13 +104,15 @@ Attempt to call
   140226142711360 8)
 for which the definition has not yet been (or is no longer) loaded.
 *****
-
+```
 Then I did this (not sure if its right but it seems to get me further):
-
+```
 sudo yum install libXpm
 ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+```
 
 which gave the following errors:
+```
 ****
 Error: Init file /large-store/p-tools/data/ptools-local/ptools-init.dat
        not found.
@@ -104,11 +127,15 @@ To do this, invoke pathway-tools with the -config option.
 Restart actions (select using :continue):
  0: Abort entirely from this (lisp) process.
 *****
+```
 
 exit
 ssh back in (to rather try from the std conda base env like before, now that we have libxm installed)
+```
 ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools
+```
 ok so still same errors as before, which means we need to do the conda deactivate afterall:
+```
 *******
 An unhandled error occurred during initialization:
 Error #<FILE-ERROR @ #x1007428ca52> occurred loading OpenSSL
@@ -118,28 +145,37 @@ Loading libcrypto.so failed with error:
 libcrypto.so: cannot open shared object file: No such file or directory.
 
 ****
-
+```
 NB: read issue 1 of https://bioinformatics.ai.sri.com/ptools/faq.html for some tips for future
 
+```
 conda deactivate
+```
 then create a config file since one doesnt exist yet:
+```
 ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools -config
 
 less /large-store/p-tools/data/ptools-local/ptools-init.dat
 nano /large-store/p-tools/data/ptools-local/ptools-init.dat
-
+```
 ^ edit the above file to have the following:
+```
 WWW-Server-SSL-Certificate NIL
 WWW-Server-Hostname localhost
 WWW-Server-Port 1555
+```
 
+```
 tmux a -t ptools
 conda deactivate
-
+```
 now, it is essential to proceed using the *xQuartz terminal* (if on mac)!
 Using that terminal (not a normal/pychar,m terminal), ssh in with the -Y flag
 and rejoin the tmux session and then run:
+```
 ./pathway-tools/aic-export/pathway-tools/ptools/25.0/pathway-tools -www -www-server-hostname 0.0.0.0
+```
+
 (when asked for x forwarding display to use, type in localhost:10.0 and hit enter a few times)
 then wait at least a minute and a wiondow shold display ion your mac!
 
@@ -147,32 +183,41 @@ Then open up port :1555 in AWS console so that we can acces the webs erver
 
 seems to not quite work
 
-
 ------------------------------------------------------------------------------------------
-# Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
+## Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
 
 Link to uniprot ftp server with all organisms ref sequen ces (AA sequneces):
+```
 https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/
+```
 
 Link to Chondrus chrispus specifically (use the top level readme to map organism to folder):
+```
 https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/
+```
 
 Download the fasta AA sequence file:
+```
 wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/UP000012073_2769.fasta.gz
-
+```
 Use the blast binaries in this location:
+```
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/
+```
 
 To construct the blast db as follows:
+```
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in UP000012073_2769.fasta -parse_seqids -blastdb_version 5 -title "chondrus_crispus_prot" -out output/chondrus_crispus_prot -taxid 2769 -dbtype prot
-
+```
 Note, to perform taxid lookups aytomatically as part of the blast search is a two step process...
 This file needs to be downloaded in the same dir as your blast db:
 ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
 
+```
 in other words do this:
 wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
 tar -xzf taxdb.tar.gz
+```
 
 And then see this VERY useful guide (the best one I've seen) for the second step
 (generating the taxid map file used as part of makeblastdb):
@@ -183,44 +228,60 @@ https://www.biostars.org/p/76551/
 
 Tip: the outformat flag might need to be used in a specific way when running blast.
 As an *example*:
+```
 -outfmt "6 qseqid sseqid evalue pident stitle staxids sscinames scomnames sblastnames sskingdoms salltitles stitle" \
+```
 
 --------
 
-Creating the phycocosm aa blastx db:
+## Creating the phycocosm aa blastx db:
 
 use the script in:
+```
 /data/davis--blast-dbs/get_jgi_genomes-release
+```
 
 to do the following:
+```
 cd /databases/blast/
 sudo mkdir phycocosm-proteins
 sudo chmod a+rw phycocosm-proteins/
+```
 
 sign in and then download all phycocosm protein sequences:
+```
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -a -l
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes   -c signon.cookie -a
+```
 
 download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+```
 wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
 mv download-group\?flt\= all_org_names_and_taxa.csv
+```
 NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
 paste from the web link into the file.
 
-Create a single fasta file from all sep fasta files
+Create a single fasta file from all sep fasta files:
+```
 cd pep
 for f in `ls`; do gunzip $f; done
 cat * > ../concatted-phycocosm-proteins.fasta
 cd ../
+```
 
 prepare them as a blastdb with tax ids and appropriately formatted fa headers with seq id and taxa (this is possible attempt one of many because of the fasta headers)
+```
 python make_tax_id_map.py
 python format_fa_headers_for_blast.py
 mkdir output
+```
 
-Build the blastdb
+Build the blastdb:
+```
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in concatted-phycocosm-proteins.fasta -parse_seqids -blastdb_version 5 -title "jgi-phycocosm-prot" -out output/jgi-phycocosm-prot -taxid_map tax_map.txt -dbtype prot
+```
 
 ok so actually, after much experimentation I decided to not run the above makeblastdb command.
 There were too many cryptic errors no matter how I tried to format the fasta headers and/or the tax_map.txt file to
@@ -228,59 +289,76 @@ accommodate these.
 Instead, I ran the following command (i.e. I didnt tell blast to expect ncbi std formatted headers - the advice I've come across most often
  is to omit this if the files arent already in the ncbi format because its a headache).
 
+```
  /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm-proteins.fasta -blastdb_version 5 -title "jgi-phycocosm-prot" -out jgi-phycocosm-prot -dbtype prot -max_file_sz '4GB'
-
+```
 The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
 
 To test the blast output format generated:
+```
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/blastx \
 -db /home/ec2-user/jbconnect/blastdb/phycocosm-prot/jgi-phycocosm-prot \
 -query /home/ec2-user/jbconnect/blastdb/tmp/ \
 76-jgi-phycocsm-original-blastx-job-blastx-query-seq.fasta \
 -outfmt '7 qaccver sseqid saccver qstart qend sstart send sseq evalue bitscore length pident nident mismatch gapopen staxid ssciname scomname stitle' -out /home/ec2-user/jbconnect/blastdb/tmp/test-jgi-phycocsm-blastx-job-blastx-results.tsv
-
+```
 
 -----------
 
-Mycocosm steps:
-
+## Mycocosm steps:
+```
 cd /databases/blast/
 mkdir mycocosm-proteins
 sudo chmod a+rw mycocosm-proteins/
 cd mycocosm-proteins
-
+```
 sign in and then download all phycocosm protein sequences:
+```
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f -l
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f
+```
 
 download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+```
 wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
 mv download-group\?flt\= all_org_names_and_taxa.csv
+```
 NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
 paste from the web link into the file.
 
 install gnu parallel (easy):
+```
 http://git.savannah.gnu.org/cgit/parallel.git/tree/README
+```
 
-Create a single fasta file from all sep fasta files and format their headers at the same time
+Create a single fasta file from all sep fasta files and format their headers at the same time:
+```
 cd pep
 for f in `ls`; do gunzip $f; done
 cd ../
 python format-and-build-fa.py
+```
 OOOOORRRRR.... run the same script in parallel much faster (preferred choice in theory but it seems to be way too slow so maybe stick with normal execution if this at first seems slow (dont increase -j here rhough!)):
+```
 for f in `ls pep/*.aa.fasta`; do echo "python format-and-build-fa.py ${f}"; done | parallel -j 6 -k
+```
 
 then concat all these temp files into a single fasta:
+```
 cat tmp_files/*.aa.fasta.tmp > concatted-mycocosm.formatted.fasta
+```
 
-Build the blastdb
+Build the blastdb:
+```
 mkdir output
 cd output
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
 -in ../concatted-mycocosm.formatted.fasta -blastdb_version 5 \
 -title "jgi-mycocosm-prot" -out jgi-mycocosm-prot \
 -dbtype prot -max_file_sz '4GB'
+```
+
 
 The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
 
@@ -293,7 +371,8 @@ Complete.
 
 -----------
 
-JGI Phytozome steps:
+## JGI Phytozome steps:
+```
 cd /databases/blast
 sudo mkdir phytozome12-proteins
 sudo chmod a+rw phytozome12-proteins/
@@ -302,9 +381,10 @@ cd phytozome12-proteins
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12 -l
 /data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12
-
+```
 
 download all phycocosm/mycocosm taxon ids (this was acquired via new email query to JGI answered on oct 20th by David Goodstein):
+```
 cd PhytozomeV12
 curl -X GET "https://phytozome-next.jgi.doe.gov/api/db/properties/proteome/456%2C502%2C281%2C461%2C227%2C325%2C228%2C229%2C231%2C317%2C539%2C538%2C320%2C318%2C310%2C522%2C521%2C676%2C91%2C572%2C291%2C531%2C566%2C322%2C459%2C548%2C392%2C382%2C309%2C692%2C575%2C453%2C388%2C494%2C589%2C467%2C689%2C256%2C506%2C553%2C505%2C551%2C451%2C390%2C514%2C691%2C448%2C686%2C297%2C457%2C530%2C679%2C673%2C492%2C122%2C501%2C677%2C675%2C275%2C508%2C678%2C510%2C509%2C571%2C567%2C491%2C285%2C580%2C581%2C563%2C442%2C670%2C534%2C298%2C687%2C385%2C573%2C562%2C561%2C588%2C469%2C540%2C545%2C544%2C541%2C558%2C543%2C559%2C507%2C200%2C305%2C520%2C671%2C445%2C210%2C444%2C533%2C532%2C119%2C289%2C519%2C518%2C449%2C113%2C233%2C523%2C472%2C264%2C384%2C167%2C447%2C278%2C266%2C474%2C470%2C484%2C585%2C482%2C489%2C582%2C483%2C173%2C485%2C478%2C476%2C477%2C473%2C574%2C486%2C479%2C446%2C277%2C481%2C488%2C487%2C480%2C584%2C475%2C471%2C583%2C526%2C529%2C458%2C527%2C524%2C221%2C525%2C182%2C154%2C565%2C586%2C321%2C498%2C504%2C550%2C587%2C304%2C290%2C324%2C668%2C462%2C386%2C323%2C499%2C680%2C503%2C296%2C463%2C577%2C316%2C490%2C314%2C556%2C549%2C460%2C537%2C515%2C283%2C337%2C343%2C364%2C379%2C336%2C369%2C356%2C333%2C381%2C359%2C372%2C355%2C349%2C362%2C353%2C331%2C361%2C378%2C346%2C328%2C344%2C374%2C380%2C357%2C363%2C352%2C334%2C365%2C345%2C376%2C367%2C354%2C370%2C329%2C348%2C358%2C338%2C366%2C339%2C375%2C351%2C342%2C330%2C368%2C347%2C377%2C350%2C373%2C335%2C326%2C360%2C340%2C371%2C341%2C332%2C327%2C560%2C497%2C450%2C516%2C672%2C312%2C311%2C500%2C454%2C564%2C552%2C468%2C669%2C493%2C681%2C682%2C683%2C443%2C513%2C684%2C512%2C685%2C308%2C495%2C590%2C496%2C591?format=tsv" -H "accept: application/json"  > all_orgs_and_taxids.tsv
 NB to note: we filter out the ones that are "restricted" in the python formatting script
@@ -324,53 +404,77 @@ cd output
 -in ../concatted-phytozome.formatted.fasta -blastdb_version 5 \
 -title "jgi-phytozome-prot" -out jgi-phytozome-prot \
 -dbtype prot
+```
 
 then add the relevant workflow scripts to the blastx plugin dir and
 symlink into jbconnect workflows, like followed in one of the above process.
 
 -----
-Build EBI bacterial blastx db steps:
+## Build EBI bacterial blastx db steps:
 
+```
 cd /databases/blast
 sudo mkdir ebi-bacterial
 sudo chmod a+rw ebi-bacterial/
 cd ebi-bacterial/
+```
 
 Download table with ALL bacterial assemblies from EBI (this command was built using the webportal available at: https://www.ebi.ac.uk/ena/browser/)
+```
 curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'result=assembly&query=tax_tree(2)&fields=accession%2Cassembly_title%2Cstudy_description%2Cscientific_name%2Ctax_id&limit=0&format=tsv' "https://www.ebi.ac.uk/ena/portal/api/search" > all_bacterial_accessions_taxon_2.tsv
+```
 Nevermind, scratch that. The EBI bacterial data portal does not have protein sequences.
 Instead, we used ensembl bacterial portal and went to the download section, i.e: https://bacteria.ensembl.org/info/data/ftp/index.html
 
 So:
+```
 cd ../
 sudo mkdir ensembl-bacteria
 sudo chmod a+rw ensembl-bacteria/
 cd ensembl-bacteria
 rsync --list-only -av --include='**/pep/*' rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ . | grep "/pep/" | sed "s|^.* bacteria_|bacteria_|g" > file_list_to_dl.txt
+```
 
 which gives this example output (sample only):
+```
 head -n 3 file_list_to_dl.txt
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/Acinetobacter_baumannii_aye_gca_000069245.ASM6924v1.pep.all.fa.gz
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/CHECKSUMS
 bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/README
+```
 
 Then use this file in the rsync cmd (I tried various combinations of --include-pattern and --exclude-pattern to no avail btw):
+```
 rsync -avrP --files-from=file_list_to_dl.txt rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ .
+```
 note that you might need to run with the flag if rsync crashes with a weird error (its due to high mem/cpu usage on the machine even though it doesnt sound like it):
+```
 --bwlimit=6000
+```
+
+```
 mkdir downloaded
 mv * downloaded
 mv downloaded/file_list_to_dl.txt .
+```
 
-format fasta headers (and bring in info from the file name into the header)
+format fasta headers (and bring in info from the file name into the header):
+```
 (no need to unzip fasta files)
 python format-fa-headers.py
+```
 
 build blastdb:
+```
 mkdir blastdb_output
+```
 (the following is needed because a simple ls or cat will fail with so many files found:)
+```
 find output/ -name '*.tmp' -print0 | xargs -0 cat > concatted-ensemble-bacteria.formatted.fasta
 (note that the above file is massive: about 76GB; so we will delete it when done)
+```
+
+```
 cd blastdb_output
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
 -in /databases/blast/ensembl-bacteria/concatted-ensemble-bacteria.formatted.fasta -blastdb_version 5 \
@@ -379,6 +483,7 @@ cd blastdb_output
 
 rm concatted-ensemble-bacteria.formatted.fasta
 touch concatted-ensemble-bacteria.formatted.fasta.was.removed.due.to.size--regenerate-it-with-cat
+```
 
 NB!! there is a chance the whole db was not moved over as the connection broke
 (instead of the abopve cmd,
@@ -391,17 +496,23 @@ automatically (i pasted it and ran it during the execution, so once the first cm
 would only have run the touch cmd, which it did).
 
 ------------------------------------------------------
-# Installing sequenceserver
+## Installing sequenceserver
 
+```
 mkdir /blastdb/sequenceserver
 cd /blastdb
 chmod a+rw sequenceserver
 cd sequenceserver
-# sudo yum -y install gem  --> ran this first but it crashed so reran the following cmd and it worked:
+```
+```
+ NOTE ---> `sudo yum -y install gem`  --> ran this first but it crashed so reran the following cmd and it worked:
+```
+```
 sudo yum install ruby-devel
 gem install sequenceserver
-
+```
 set up directory to store blastdbs for seq server and link in the latest gene/prot prediction seqs:
+```
 mkdir /blastdb/sequenceserver/dbs
 cd /blastdb/sequenceserver/dbs
 ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_proteins_v2.fasta .
@@ -409,41 +520,57 @@ ln -s /data/juans-annotations/oct18-version/Kappaphycus_alvarezii_cdna_v2.fasta 
 do the same for the genome assemby:
 ln -s /data/moved-from-home-dir/data/kappaphycus_alvarezii_genome/GCA_002205965.3_ASM220596v3_genomic.fasta .
 
-
 tmux
+```
 then rename it to sequenceserver
+```
 tmux a -t sequenceserver
+```
 
 then run sequenceserver to set it up for the first time and follow the prompts:
+```
 sequenceserver
+```
+
 and supply it with the blast+ binaries and dbs folder, i.e.:
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/
 
+
 to restart the server in future, you just rerun:
+```
 sequenceserver
-
-
+```
 
 ------------------------------------------------------------------------------------------
-# I think this was the cmd to add the repeat mnasker track:
+## I think this was the cmd to add the repeat mnasker track:
+
+```
 ./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
-
+```
 
 ------------------------------------------------------------------------------------------
-# I think this was the cmd used to build the current (soon to be replaced) annotation track
+## I think this was the cmd used to build the current (soon to be replaced) annotation track
+
+```
 some cmd here to add gff
-./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+```
 
+```
+./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+```
 
 ------------------------------------------------------------------------------------------
-# Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
+## Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
 
+```
 install gnu parallel (easy):
 http://git.savannah.gnu.org/cgit/parallel.git/tree/README
 
 tmux a -t build-blast-db
+```
 
 The following are completed after phycocosm sequences are already downloaded to the below path, using get_jgi_genomes gutub open source tool
+```
 cd /blastdb/phycocosm
 
 for f in `ls assembly/*.fasta`; do echo "python format-and-build-fasta.py ${f}"; done | parallel -j 6 -k
@@ -455,27 +582,32 @@ mkdir output
 cd output
 
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm.fasta -blastdb_version 5 -title "jgi-phycocosm" -out jgi-phycocosm -dbtype nucl
+```
 
 The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
 
 Then test the run using the following:
+```
 /data/jbconnect/blastbin/ncbi-blast-2.8.1+/bin/blastn -db /data/jbconnect/blastdb/jgi-phycocosm/jgi-phycocosm -outfmt 5 -out /data/jbconnect/node_modules/@gmod/jbrowse/d
 ata/Kappaphycus_alvarezii/jblastdata/592c1e30-3c70-11ec-9eee-5b7e88f1a1a1.blastxml -query /data/jbconnect/node_modules/@gmod/jbrowse/data/Kappaphycus_alvarezii/jblastdata/blast_region16
 35921371543.fa
 
-
+```
 
 ------------------------------------------------------------------------------------------
-# Stesp to copy meiks transcriptome across to ec2 instance:
+## Stesp to copy meiks transcriptome across to ec2 instance:
 
 first mkdirs:
+```
 /databases/transcriptome_assembly_meik
 
 then from within the cro server, inside my ftp folder space:
 scp -i deleteme.txt -r 01_denovo ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
 scp -i deleteme.txt -r 02_guided ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
+```
 
 then add as tracks:
+```
 mkdir /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
 cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
 
@@ -498,34 +630,42 @@ data/transcriptome/redalgae-guided.fasta \
 --key "Guided Transcriptome assembly"
 
 (--indexed_fasta did not work in borwser!)
-
+```
 
 ------------------------------------------------------------------------------------------
-# Stesp to copy meiks transcriptome **annotations** across to ec2 instance and REDO the adding of
-# transcriptome reference sequence as a new ref seq to the app + adding all annotation files
+## Stesp to copy meiks transcriptome **annotations** across to ec2 instance and REDO the adding of transcriptome reference sequence as a new ref seq to the app + adding all annotation files
 
 first mkdirs:
+```
 mkdir -p /large-store/annotations/transcriptome_assembly_meik/03_annotation/
 cd /large-store/annotations/transcriptome_assembly_meik/03_annotation/
+```
 
 then from within the cro server:
+```
 cd /scratch/projects/c026/algea/transcriptome_Meik/03_annotation
 scp -i deleteme.txt -r recommended scp -i /scratch/ftp/user2046/deleteme.txt -r recommended ec2-user@52.90.88.45:/large-store/annotations/transcriptome_assembly_meik/03_annotation
+```
 
 then back to the aws server from now on, move the other transcriptome files to live closer to these (note that this will break softklinks in the app but we dont care
 about them because we are going to rather re-add these as an entirely new ref sequnce in the app.
+
+```
 cd ..
 mv /databases/transcriptome_assembly_meik/* .
+```
 
 go into previous trans folder and replace broken links with new ones:
+```
 cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
 unlink redalgae-denovo.fasta
 unlink redalgae-guided.fasta
 ln -s /large-store/annotations/transcriptome_assembly_meik/01_denovo/redalgae-denovo.fasta .
 ln -s /large-store/annotations/transcriptome_assembly_meik/02_guided/redalgae-guided.fasta .
-
+```
 
 NB!!! In case something goes wrong in the app later! I moved some files as follows:
+```
 (base) [ec2-user@ip-172-31-89-223 data]$ mv davis--blast-dbs/blastdbs/phycocosm /large-store/blastdbs-moved/phycocosm
 (base) [ec2-user@ip-172-31-89-223 data]$ cd davis--blast-dbs/blastdbs/
 (base) [ec2-user@ip-172-31-89-223 blastdbs]$ ls
@@ -533,10 +673,10 @@ NB!!! In case something goes wrong in the app later! I moved some files as follo
 phycocosm.00.nhr  phycocosm.00.nog  phycocosm.01.nhr  phycocosm.01.nog  phycocosm.02.nhr  phycocosm.02.nog  phycocosm.nal  phycocosm.nos  phycocosm.ntf
 phycocosm.00.nin  phycocosm.00.nsq  phycocosm.01.nin  phycocosm.01.nsq  phycocosm.02.nin  phycocosm.02.nsq  phycocosm.ndb  phycocosm.not  phycocosm.nto
 (base) [ec2-user@ip-172-31-89-223 blastdbs]$ ln -s /large-store/blastdbs-moved/phycocosm .
-
-
+```
 
 Build new ref sequence:
+```
 cd - (i.e. into jbrowse root folder)
 
 ./bin/prepare-refseqs.pl --fasta \
@@ -544,28 +684,35 @@ data/transcriptome/redalgae-denovo.fasta \
 --out data/Kappaphycus_alvarezii_transcriptome \
 --trackLabel "De novo transcriptome assembly" \
 --key "De novo transcriptome assembly"
+```
 
 The above was tested and worked in the browser, now time to format and add annotation tracks:
 Firstly, the annotation gff file seems to have UTF-8 encoded URL in the fields which needs to be changed, eg:
+
+```
 TRINITY_DN0_c0_g1_i1    transdecoder    gene    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF%20TRINITY_DN0_c0_g1_i1%7Cg.2833%20TRINITY_DN0_c0_g1_i1%7Cm.2833%20type%3A3prime_partial%20len%3A119%20%28%2B%29
 TRINITY_DN0_c0_g1_i1    transdecoder    mRNA    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833;Parent=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF%20TRINITY_DN0_c0_g1_i1%7Cg.2833%20TRINITY_DN0_c0_g1_i1%7Cm.2833%20type%3A3prime_partial%20len%3A119%20%28%2B%29
+```
 
 so therefore run the script to reformat:
+```
 python format-gff3.py
+```
 
 and get a list of params in the gff to use during adding the track:
+```
 head -n 3 transcripts.formatted.gff3
 
-output:
 TRINITY_DN0_c0_g1_i1    transdecoder    gene    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF TRINITY_DN0_c0_g1_i1|g.2833 TRINITY_DN0_c0_g1_i1|m.2833 type:3prime_partial len:119 (+)
 TRINITY_DN0_c0_g1_i1    transdecoder    mRNA    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833;Parent=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF TRINITY_DN0_c0_g1_i1|g.2833 TRINITY_DN0_c0_g1_i1|m.2833 type:3prime_partial len:119 (+)
 TRINITY_DN0_c0_g1_i1    transdecoder    five_prime_UTR  1       550     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833.utr5p1;Parent=TRINITY_DN0_c0_g1_i1|m.2833
+```
 
 Note that the script also adds some essential gff3 tags to the file, for example the header,
 and rows with "###" which are essential for the flatfile to json script to run properly.
 Otherwise it crashes with the uninformative error "Killed." which is due to memory/file format.
 
-
+```
 pwd
 cd ~/jbconnect/node_modules/@gmod/jbrowse/
 cd data/transcriptome/
@@ -578,14 +725,20 @@ cd ../..
 --nameAttributes "ID,Name" \
 --sortMem 209715200 \
 --maxLookback 1000
+```
 
+^ the above crashed due to disk space... so..
+NB!!! In case something goes wrong in the app later! I moved some files as follows:
 
-
-
-
+```
+mv /data/data-dir-used-by-jbrowse1-data-dir /large-store/data-dir-used-by-jbrowse1-data-dir
+cd ~/jbconnect/node_modules/@gmod/jbrowse/
+ln -s /large-store/data-dir-used-by-jbrowse1-data-dir data
+```
 
 ---------------------------------------------------------
-ranodm;
+---------------------------------------------------------
+# Random [IGNORE]
 
         {
          "category" : "Annotations",
