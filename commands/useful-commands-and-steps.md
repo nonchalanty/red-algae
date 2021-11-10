@@ -677,6 +677,7 @@ phycocosm.00.nin  phycocosm.00.nsq  phycocosm.01.nin  phycocosm.01.nsq  phycocos
 
 Build new ref sequence:
 ```
+tmux a -t indexing
 cd - (i.e. into jbrowse root folder)
 
 ./bin/prepare-refseqs.pl --fasta \
@@ -733,8 +734,17 @@ NB!!! In case something goes wrong in the app later! I moved some files as follo
 ```
 mv /data/data-dir-used-by-jbrowse1-data-dir /large-store/data-dir-used-by-jbrowse1-data-dir
 cd ~/jbconnect/node_modules/@gmod/jbrowse/
+unlink data
 ln -s /large-store/data-dir-used-by-jbrowse1-data-dir data
 ```
+
+Then try rerunning the crashed script:
+```
+./bin/flatfile-to-json.pl --gff data/transcriptome/transcripts.formatted.gff3 --trackLabel "Annotated genes - transcriptome" --key "Annotated genes - transcriptome" --out data/Kappaphycus_alvarezii_transcriptome --nameAttributes "ID,Name" --sortMem 109715200 --maxLookback 100
+```
+
+It ran to completion.
+I then restarted the server and can confirm that it works after these changes.
 
 ---------------------------------------------------------
 ---------------------------------------------------------
