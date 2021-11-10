@@ -5,82 +5,6 @@ But some other useful things to note for future:
 - the jbconnect/sails server is being run from the (base) conda env!
 - it is being run in a tmux session called "serve"
 
-------------------------------------------------------------------------------------------
-# Stesp to copy meiks transcriptome across to ec2 instance:
-
-first mkdirs:
-/databases/transcriptome_assembly_meik
-
-then from within the cro server, inside my ftp folder space:
-scp -i deleteme.txt -r 01_denovo ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
-scp -i deleteme.txt -r 02_guided ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
-
-then add as tracks:
-mkdir /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
-cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
-
-ln -s /databases/transcriptome_assembly_meik/01_denovo/redalgae-denovo.fasta .
-ln -s /databases/transcriptome_assembly_meik/02_guided/redalgae-guided.fasta .
-samtools faidx redalgae-denovo.fasta
-samtools faidx redalgae-guided.fasta
-cd ../..
-
-./bin/prepare-refseqs.pl --fasta \
-data/transcriptome/redalgae-denovo.fasta \
---out data/Kappaphycus_alvarezii \
---trackLabel "De novo Transcriptome assembly" \
---key "De novo Transcriptome assembly"
-
-./bin/prepare-refseqs.pl --fasta \
-data/transcriptome/redalgae-guided.fasta \
---out data/Kappaphycus_alvarezii \
---trackLabel "Guided Transcriptome assembly" \
---key "Guided Transcriptome assembly"
-
-(--indexed_fasta did not work in borwser!)
-
-------------------------------------------------------------------------------------------
-# I think this was the cmd to add the repeat mnasker track:
-./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
-
-
-------------------------------------------------------------------------------------------
-# I think this was the cmd used to build the current (soon to be replaced) annotation track
-some cmd here to add gff
-./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
-
-
-------------------------------------------------------------------------------------------
-# Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
-
-
-
-install gnu parallel (easy):
-http://git.savannah.gnu.org/cgit/parallel.git/tree/README
-
-tmux a -t build-blast-db
-
-The following are completed after phycocosm sequences are already downloaded to the below path, using get_jgi_genomes gutub open source tool
-cd /blastdb/phycocosm
-
-for f in `ls assembly/*.fasta`; do echo "python format-and-build-fasta.py ${f}"; done | parallel -j 6 -k
-
-mkdir annotated-assembly-v2/
-cat tmp_files/*.tmp > annotated-assembly-v2/concatted-phycocosm.fasta
-cd annotated-assembly-v2/
-mkdir output
-cd output
-
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm.fasta -blastdb_version 5 -title "jgi-phycocosm" -out jgi-phycocosm -dbtype nucl
-
-The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
-
-Then test the run using the following:
-/data/jbconnect/blastbin/ncbi-blast-2.8.1+/bin/blastn -db /data/jbconnect/blastdb/jgi-phycocosm/jgi-phycocosm -outfmt 5 -out /data/jbconnect/node_modules/@gmod/jbrowse/d
-ata/Kappaphycus_alvarezii/jblastdata/592c1e30-3c70-11ec-9eee-5b7e88f1a1a1.blastxml -query /data/jbconnect/node_modules/@gmod/jbrowse/data/Kappaphycus_alvarezii/jblastdata/blast_region16
-35921371543.fa
-
-
 
 ------------------------------------------------------------------------------------------
 # Steps taken to download and install pathway tools (rough copy paste of most of the cmds)
@@ -194,6 +118,8 @@ Loading libcrypto.so failed with error:
 libcrypto.so: cannot open shared object file: No such file or directory.
 
 ****
+
+NB: read issue 1 of https://bioinformatics.ai.sri.com/ptools/faq.html for some tips for future
 
 conda deactivate
 then create a config file since one doesnt exist yet:
@@ -495,6 +421,165 @@ and supply it with the blast+ binaries and dbs folder, i.e.:
 
 to restart the server in future, you just rerun:
 sequenceserver
+
+
+
+------------------------------------------------------------------------------------------
+# I think this was the cmd to add the repeat mnasker track:
+./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
+
+
+------------------------------------------------------------------------------------------
+# I think this was the cmd used to build the current (soon to be replaced) annotation track
+some cmd here to add gff
+./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+
+
+------------------------------------------------------------------------------------------
+# Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
+
+install gnu parallel (easy):
+http://git.savannah.gnu.org/cgit/parallel.git/tree/README
+
+tmux a -t build-blast-db
+
+The following are completed after phycocosm sequences are already downloaded to the below path, using get_jgi_genomes gutub open source tool
+cd /blastdb/phycocosm
+
+for f in `ls assembly/*.fasta`; do echo "python format-and-build-fasta.py ${f}"; done | parallel -j 6 -k
+
+mkdir annotated-assembly-v2/
+cat tmp_files/*.tmp > annotated-assembly-v2/concatted-phycocosm.fasta
+cd annotated-assembly-v2/
+mkdir output
+cd output
+
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm.fasta -blastdb_version 5 -title "jgi-phycocosm" -out jgi-phycocosm -dbtype nucl
+
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+Then test the run using the following:
+/data/jbconnect/blastbin/ncbi-blast-2.8.1+/bin/blastn -db /data/jbconnect/blastdb/jgi-phycocosm/jgi-phycocosm -outfmt 5 -out /data/jbconnect/node_modules/@gmod/jbrowse/d
+ata/Kappaphycus_alvarezii/jblastdata/592c1e30-3c70-11ec-9eee-5b7e88f1a1a1.blastxml -query /data/jbconnect/node_modules/@gmod/jbrowse/data/Kappaphycus_alvarezii/jblastdata/blast_region16
+35921371543.fa
+
+
+
+------------------------------------------------------------------------------------------
+# Stesp to copy meiks transcriptome across to ec2 instance:
+
+first mkdirs:
+/databases/transcriptome_assembly_meik
+
+then from within the cro server, inside my ftp folder space:
+scp -i deleteme.txt -r 01_denovo ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
+scp -i deleteme.txt -r 02_guided ec2-user@52.90.88.45:/databases/transcriptome_assembly_meik
+
+then add as tracks:
+mkdir /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+
+ln -s /databases/transcriptome_assembly_meik/01_denovo/redalgae-denovo.fasta .
+ln -s /databases/transcriptome_assembly_meik/02_guided/redalgae-guided.fasta .
+samtools faidx redalgae-denovo.fasta
+samtools faidx redalgae-guided.fasta
+cd ../..
+
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-denovo.fasta \
+--out data/Kappaphycus_alvarezii \
+--trackLabel "De novo Transcriptome assembly" \
+--key "De novo Transcriptome assembly"
+
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-guided.fasta \
+--out data/Kappaphycus_alvarezii \
+--trackLabel "Guided Transcriptome assembly" \
+--key "Guided Transcriptome assembly"
+
+(--indexed_fasta did not work in borwser!)
+
+
+------------------------------------------------------------------------------------------
+# Stesp to copy meiks transcriptome **annotations** across to ec2 instance and REDO the adding of
+# transcriptome reference sequence as a new ref seq to the app + adding all annotation files
+
+first mkdirs:
+mkdir -p /large-store/annotations/transcriptome_assembly_meik/03_annotation/
+cd /large-store/annotations/transcriptome_assembly_meik/03_annotation/
+
+then from within the cro server:
+cd /scratch/projects/c026/algea/transcriptome_Meik/03_annotation
+scp -i deleteme.txt -r recommended scp -i /scratch/ftp/user2046/deleteme.txt -r recommended ec2-user@52.90.88.45:/large-store/annotations/transcriptome_assembly_meik/03_annotation
+
+then back to the aws server from now on, move the other transcriptome files to live closer to these (note that this will break softklinks in the app but we dont care
+about them because we are going to rather re-add these as an entirely new ref sequnce in the app.
+cd ..
+mv /databases/transcriptome_assembly_meik/* .
+
+go into previous trans folder and replace broken links with new ones:
+cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+unlink redalgae-denovo.fasta
+unlink redalgae-guided.fasta
+ln -s /large-store/annotations/transcriptome_assembly_meik/01_denovo/redalgae-denovo.fasta .
+ln -s /large-store/annotations/transcriptome_assembly_meik/02_guided/redalgae-guided.fasta .
+
+
+NB!!! In case something goes wrong in the app later! I moved some files as follows:
+(base) [ec2-user@ip-172-31-89-223 data]$ mv davis--blast-dbs/blastdbs/phycocosm /large-store/blastdbs-moved/phycocosm
+(base) [ec2-user@ip-172-31-89-223 data]$ cd davis--blast-dbs/blastdbs/
+(base) [ec2-user@ip-172-31-89-223 blastdbs]$ ls
+(base) [ec2-user@ip-172-31-89-223 blastdbs]$ ls /large-store/blastdbs-moved/phycocosm/
+phycocosm.00.nhr  phycocosm.00.nog  phycocosm.01.nhr  phycocosm.01.nog  phycocosm.02.nhr  phycocosm.02.nog  phycocosm.nal  phycocosm.nos  phycocosm.ntf
+phycocosm.00.nin  phycocosm.00.nsq  phycocosm.01.nin  phycocosm.01.nsq  phycocosm.02.nin  phycocosm.02.nsq  phycocosm.ndb  phycocosm.not  phycocosm.nto
+(base) [ec2-user@ip-172-31-89-223 blastdbs]$ ln -s /large-store/blastdbs-moved/phycocosm .
+
+
+
+Build new ref sequence:
+cd - (i.e. into jbrowse root folder)
+
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-denovo.fasta \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--trackLabel "De novo transcriptome assembly" \
+--key "De novo transcriptome assembly"
+
+The above was tested and worked in the browser, now time to format and add annotation tracks:
+Firstly, the annotation gff file seems to have UTF-8 encoded URL in the fields which needs to be changed, eg:
+TRINITY_DN0_c0_g1_i1    transdecoder    gene    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF%20TRINITY_DN0_c0_g1_i1%7Cg.2833%20TRINITY_DN0_c0_g1_i1%7Cm.2833%20type%3A3prime_partial%20len%3A119%20%28%2B%29
+TRINITY_DN0_c0_g1_i1    transdecoder    mRNA    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833;Parent=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF%20TRINITY_DN0_c0_g1_i1%7Cg.2833%20TRINITY_DN0_c0_g1_i1%7Cm.2833%20type%3A3prime_partial%20len%3A119%20%28%2B%29
+
+so therefore run the script to reformat:
+python format-gff3.py
+
+and get a list of params in the gff to use during adding the track:
+head -n 3 transcripts.formatted.gff3
+
+output:
+TRINITY_DN0_c0_g1_i1    transdecoder    gene    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF TRINITY_DN0_c0_g1_i1|g.2833 TRINITY_DN0_c0_g1_i1|m.2833 type:3prime_partial len:119 (+)
+TRINITY_DN0_c0_g1_i1    transdecoder    mRNA    1       906     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833;Parent=TRINITY_DN0_c0_g1_i1|g.2833;Name=ORF TRINITY_DN0_c0_g1_i1|g.2833 TRINITY_DN0_c0_g1_i1|m.2833 type:3prime_partial len:119 (+)
+TRINITY_DN0_c0_g1_i1    transdecoder    five_prime_UTR  1       550     .       +       .       ID=TRINITY_DN0_c0_g1_i1|m.2833.utr5p1;Parent=TRINITY_DN0_c0_g1_i1|m.2833
+
+Note that the script also adds some essential gff3 tags to the file, for example the header,
+and rows with "###" which are essential for the flatfile to json script to run properly.
+Otherwise it crashes with the uninformative error "Killed." which is due to memory/file format.
+
+
+pwd
+cd ~/jbconnect/node_modules/@gmod/jbrowse/
+cd data/transcriptome/
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/transcripts.formatted.gff3 .
+cd ../..
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/transcripts.formatted.gff3 \
+--trackLabel "Annotated genes - transcriptome" --key "Annotated genes - transcriptome" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name" \
+--sortMem 209715200 \
+--maxLookback 1000
+
+
 
 
 
