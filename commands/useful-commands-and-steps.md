@@ -19,6 +19,338 @@ But some other useful things to note for future:
 
 
 ------------------------------------------------------------------------------------------
+## Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
+
+Link to uniprot ftp server with all organisms ref sequen ces (AA sequneces):
+```
+https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/
+```
+
+Link to Chondrus chrispus specifically (use the top level readme to map organism to folder):
+```
+https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/
+```
+
+Download the fasta AA sequence file:
+```
+wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/UP000012073_2769.fasta.gz
+```
+Use the blast binaries in this location:
+```
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/
+```
+
+To construct the blast db as follows:
+```
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in UP000012073_2769.fasta -parse_seqids -blastdb_version 5 -title "chondrus_crispus_prot" -out output/chondrus_crispus_prot -taxid 2769 -dbtype prot
+```
+Note, to perform taxid lookups aytomatically as part of the blast search is a two step process...
+This file needs to be downloaded in the same dir as your blast db:
+ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
+
+```
+in other words do this:
+wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
+tar -xzf taxdb.tar.gz
+```
+
+And then see this VERY useful guide (the best one I've seen) for the second step
+(generating the taxid map file used as part of makeblastdb):
+http://www.verdantforce.com/2014/12/building-blast-databases-with-taxonomy.html
+
+Also see this post:
+https://www.biostars.org/p/76551/
+
+Tip: the outformat flag might need to be used in a specific way when running blast.
+As an *example*:
+```
+-outfmt "6 qseqid sseqid evalue pident stitle staxids sscinames scomnames sblastnames sskingdoms salltitles stitle" \
+```
+
+--------
+
+## Creating the phycocosm aa blastx db:
+
+use the script in:
+```
+/data/davis--blast-dbs/get_jgi_genomes-release
+```
+
+to do the following:
+```
+cd /databases/blast/
+sudo mkdir phycocosm-proteins
+sudo chmod a+rw phycocosm-proteins/
+```
+
+sign in and then download all phycocosm protein sequences:
+```
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -a -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes   -c signon.cookie -a
+```
+
+download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+```
+wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
+mv download-group\?flt\= all_org_names_and_taxa.csv
+```
+NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
+paste from the web link into the file.
+
+Create a single fasta file from all sep fasta files:
+```
+cd pep
+for f in `ls`; do gunzip $f; done
+cat * > ../concatted-phycocosm-proteins.fasta
+cd ../
+```
+
+prepare them as a blastdb with tax ids and appropriately formatted fa headers with seq id and taxa (this is possible attempt one of many because of the fasta headers)
+```
+python make_tax_id_map.py
+python format_fa_headers_for_blast.py
+mkdir output
+```
+
+Build the blastdb:
+```
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in concatted-phycocosm-proteins.fasta -parse_seqids -blastdb_version 5 -title "jgi-phycocosm-prot" -out output/jgi-phycocosm-prot -taxid_map tax_map.txt -dbtype prot
+```
+
+ok so actually, after much experimentation I decided to not run the above makeblastdb command.
+There were too many cryptic errors no matter how I tried to format the fasta headers and/or the tax_map.txt file to
+accommodate these.
+Instead, I ran the following command (i.e. I didnt tell blast to expect ncbi std formatted headers - the advice I've come across most often
+ is to omit this if the files arent already in the ncbi format because its a headache).
+
+```
+ /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm-proteins.fasta -blastdb_version 5 -title "jgi-phycocosm-prot" -out jgi-phycocosm-prot -dbtype prot -max_file_sz '4GB'
+```
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+To test the blast output format generated:
+```
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/blastx \
+-db /home/ec2-user/jbconnect/blastdb/phycocosm-prot/jgi-phycocosm-prot \
+-query /home/ec2-user/jbconnect/blastdb/tmp/ \
+76-jgi-phycocsm-original-blastx-job-blastx-query-seq.fasta \
+-outfmt '7 qaccver sseqid saccver qstart qend sstart send sseq evalue bitscore length pident nident mismatch gapopen staxid ssciname scomname stitle' -out /home/ec2-user/jbconnect/blastdb/tmp/test-jgi-phycocsm-blastx-job-blastx-results.tsv
+```
+
+-----------
+
+## Mycocosm steps:
+```
+cd /databases/blast/
+mkdir mycocosm-proteins
+sudo chmod a+rw mycocosm-proteins/
+cd mycocosm-proteins
+```
+sign in and then download all phycocosm protein sequences:
+```
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f
+```
+
+download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
+```
+wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
+mv download-group\?flt\= all_org_names_and_taxa.csv
+```
+NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
+paste from the web link into the file.
+
+install gnu parallel (easy):
+```
+http://git.savannah.gnu.org/cgit/parallel.git/tree/README
+```
+
+Create a single fasta file from all sep fasta files and format their headers at the same time:
+```
+cd pep
+for f in `ls`; do gunzip $f; done
+cd ../
+python format-and-build-fa.py
+```
+OR... run the same script in parallel much faster (preferred choice in theory but it seems to be way too slow so maybe stick with normal execution if this at first seems slow (dont increase -j here rhough!)):
+```
+for f in `ls pep/*.aa.fasta`; do echo "python format-and-build-fa.py ${f}"; done | parallel -j 6 -k
+```
+
+then concat all these temp files into a single fasta:
+```
+cat tmp_files/*.aa.fasta.tmp > concatted-mycocosm.formatted.fasta
+```
+
+Build the blastdb:
+```
+mkdir output
+cd output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in ../concatted-mycocosm.formatted.fasta -blastdb_version 5 \
+-title "jgi-mycocosm-prot" -out jgi-mycocosm-prot \
+-dbtype prot -max_file_sz '4GB'
+```
+
+
+The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
+
+a workflow script was created in the usual place (jbconnect/node_modules/blastx-../workflows/...py and softlinked into jbconnect/workflows
+and the above blast db was softlinked into the uisual place: jbconnect/blastdb/
+
+Tested successfully in app.
+Complete.
+
+
+-----------
+
+## JGI Phytozome steps:
+```
+cd /databases/blast
+sudo mkdir phytozome12-proteins
+sudo chmod a+rw phytozome12-proteins/
+cd phytozome12-proteins
+
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12 -l
+/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12
+```
+
+download all phycocosm/mycocosm taxon ids (this was acquired via new email query to JGI answered on oct 20th by David Goodstein):
+```
+cd PhytozomeV12
+curl -X GET "https://phytozome-next.jgi.doe.gov/api/db/properties/proteome/456%2C502%2C281%2C461%2C227%2C325%2C228%2C229%2C231%2C317%2C539%2C538%2C320%2C318%2C310%2C522%2C521%2C676%2C91%2C572%2C291%2C531%2C566%2C322%2C459%2C548%2C392%2C382%2C309%2C692%2C575%2C453%2C388%2C494%2C589%2C467%2C689%2C256%2C506%2C553%2C505%2C551%2C451%2C390%2C514%2C691%2C448%2C686%2C297%2C457%2C530%2C679%2C673%2C492%2C122%2C501%2C677%2C675%2C275%2C508%2C678%2C510%2C509%2C571%2C567%2C491%2C285%2C580%2C581%2C563%2C442%2C670%2C534%2C298%2C687%2C385%2C573%2C562%2C561%2C588%2C469%2C540%2C545%2C544%2C541%2C558%2C543%2C559%2C507%2C200%2C305%2C520%2C671%2C445%2C210%2C444%2C533%2C532%2C119%2C289%2C519%2C518%2C449%2C113%2C233%2C523%2C472%2C264%2C384%2C167%2C447%2C278%2C266%2C474%2C470%2C484%2C585%2C482%2C489%2C582%2C483%2C173%2C485%2C478%2C476%2C477%2C473%2C574%2C486%2C479%2C446%2C277%2C481%2C488%2C487%2C480%2C584%2C475%2C471%2C583%2C526%2C529%2C458%2C527%2C524%2C221%2C525%2C182%2C154%2C565%2C586%2C321%2C498%2C504%2C550%2C587%2C304%2C290%2C324%2C668%2C462%2C386%2C323%2C499%2C680%2C503%2C296%2C463%2C577%2C316%2C490%2C314%2C556%2C549%2C460%2C537%2C515%2C283%2C337%2C343%2C364%2C379%2C336%2C369%2C356%2C333%2C381%2C359%2C372%2C355%2C349%2C362%2C353%2C331%2C361%2C378%2C346%2C328%2C344%2C374%2C380%2C357%2C363%2C352%2C334%2C365%2C345%2C376%2C367%2C354%2C370%2C329%2C348%2C358%2C338%2C366%2C339%2C375%2C351%2C342%2C330%2C368%2C347%2C377%2C350%2C373%2C335%2C326%2C360%2C340%2C371%2C341%2C332%2C327%2C560%2C497%2C450%2C516%2C672%2C312%2C311%2C500%2C454%2C564%2C552%2C468%2C669%2C493%2C681%2C682%2C683%2C443%2C513%2C684%2C512%2C685%2C308%2C495%2C590%2C496%2C591?format=tsv" -H "accept: application/json"  > all_orgs_and_taxids.tsv
+NB to note: we filter out the ones that are "restricted" in the python formatting script
+
+cd pep
+for f in `ls`; do gunzip $f; done
+cd ..
+
+format fasta headers of files and concat into one fasta:
+python format-and-build-fa.py
+
+build blastdb:
+mkdir output
+cat tmp_files/*.tmp > concatted-phytozome.formatted.fasta
+cd output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in ../concatted-phytozome.formatted.fasta -blastdb_version 5 \
+-title "jgi-phytozome-prot" -out jgi-phytozome-prot \
+-dbtype prot
+```
+
+then add the relevant workflow scripts to the blastx plugin dir and
+symlink into jbconnect workflows, like followed in one of the above process.
+
+-----
+## Build EBI bacterial blastx db steps:
+
+```
+cd /databases/blast
+sudo mkdir ebi-bacterial
+sudo chmod a+rw ebi-bacterial/
+cd ebi-bacterial/
+```
+
+Download table with ALL bacterial assemblies from EBI (this command was built using the webportal available at: https://www.ebi.ac.uk/ena/browser/)
+```
+curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'result=assembly&query=tax_tree(2)&fields=accession%2Cassembly_title%2Cstudy_description%2Cscientific_name%2Ctax_id&limit=0&format=tsv' "https://www.ebi.ac.uk/ena/portal/api/search" > all_bacterial_accessions_taxon_2.tsv
+```
+Nevermind, scratch that. The EBI bacterial data portal does not have protein sequences.
+Instead, we used ensembl bacterial portal and went to the download section, i.e: https://bacteria.ensembl.org/info/data/ftp/index.html
+
+So:
+```
+cd ../
+sudo mkdir ensembl-bacteria
+sudo chmod a+rw ensembl-bacteria/
+cd ensembl-bacteria
+rsync --list-only -av --include='**/pep/*' rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ . | grep "/pep/" | sed "s|^.* bacteria_|bacteria_|g" > file_list_to_dl.txt
+```
+
+which gives this example output (sample only):
+```
+head -n 3 file_list_to_dl.txt
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/Acinetobacter_baumannii_aye_gca_000069245.ASM6924v1.pep.all.fa.gz
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/CHECKSUMS
+bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/README
+```
+
+Then use this file in the rsync cmd (I tried various combinations of --include-pattern and --exclude-pattern to no avail btw):
+```
+rsync -avrP --files-from=file_list_to_dl.txt rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ .
+```
+note that you might need to run with the flag if rsync crashes with a weird error (its due to high mem/cpu usage on the machine even though it doesnt sound like it):
+```
+--bwlimit=6000
+```
+
+```
+mkdir downloaded
+mv * downloaded
+mv downloaded/file_list_to_dl.txt .
+```
+
+format fasta headers (and bring in info from the file name into the header):
+```
+(no need to unzip fasta files)
+python format-fa-headers.py
+```
+
+build blastdb:
+```
+mkdir blastdb_output
+```
+(the following is needed because a simple ls or cat will fail with so many files found:)
+```
+find output/ -name '*.tmp' -print0 | xargs -0 cat > concatted-ensemble-bacteria.formatted.fasta
+(note that the above file is massive: about 76GB; so we will delete it when done)
+```
+
+```
+cd blastdb_output
+/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
+-in /databases/blast/ensembl-bacteria/concatted-ensemble-bacteria.formatted.fasta -blastdb_version 5 \
+-title "ens-bacteria-prot" -out ens-bacteria-prot \
+-dbtype prot
+
+rm concatted-ensemble-bacteria.formatted.fasta
+touch concatted-ensemble-bacteria.formatted.fasta.was.removed.due.to.size--regenerate-it-with-cat
+```
+
+NB!! there is a chance the whole db was not moved over as the connection broke
+(instead of the abopve cmd,
+I actually built the db in /blastdb, deleted the concatted fasta file, and moved it back to
+the working dir of /databases/blast/ens....
+Now since I deleted the concatted fasta (which took long to build), it would be difficult to
+rebuild (since I am pretty sure that the whole dir was indeed copied) - its low risk but
+bear in mind in case any weird results later on. Also, it **did** run the above touch cmd
+automatically (i pasted it and ran it during the execution, so once the first cmd finished then it
+would only have run the touch cmd, which it did).
+
+
+------------------------------------------------------------------------------------------
+## I think this was the cmd to add the repeat mnasker track:
+
+```
+./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
+```
+
+------------------------------------------------------------------------------------------
+## I think this was the cmd used to build the current (soon to be replaced) annotation track
+
+```
+some cmd here to add gff
+```
+
+```
+./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+```
+
+
+------------------------------------------------------------------------------------------
 ## Steps taken to download and install pathway tools (rough copy paste of most of the cmds)
  
  ```
@@ -179,321 +511,10 @@ and rejoin the tmux session and then run:
 (when asked for x forwarding display to use, type in localhost:10.0 and hit enter a few times)
 then wait at least a minute and a wiondow shold display ion your mac!
 
-Then open up port :1555 in AWS console so that we can acces the webs erver
+Then open up port `:1555` in AWS console so that we can access the webserver
 
-seems to not quite work
+seems to not quite work.
 
-------------------------------------------------------------------------------------------
-## Steps taken to download and prepare chondrus crispus protein blast db for blastx search:
-
-Link to uniprot ftp server with all organisms ref sequen ces (AA sequneces):
-```
-https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/
-```
-
-Link to Chondrus chrispus specifically (use the top level readme to map organism to folder):
-```
-https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/
-```
-
-Download the fasta AA sequence file:
-```
-wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Eukaryota/UP000012073/UP000012073_2769.fasta.gz
-```
-Use the blast binaries in this location:
-```
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/
-```
-
-To construct the blast db as follows:
-```
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in UP000012073_2769.fasta -parse_seqids -blastdb_version 5 -title "chondrus_crispus_prot" -out output/chondrus_crispus_prot -taxid 2769 -dbtype prot
-```
-Note, to perform taxid lookups aytomatically as part of the blast search is a two step process...
-This file needs to be downloaded in the same dir as your blast db:
-ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
-
-```
-in other words do this:
-wget ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
-tar -xzf taxdb.tar.gz
-```
-
-And then see this VERY useful guide (the best one I've seen) for the second step
-(generating the taxid map file used as part of makeblastdb):
-http://www.verdantforce.com/2014/12/building-blast-databases-with-taxonomy.html
-
-Also see this post:
-https://www.biostars.org/p/76551/
-
-Tip: the outformat flag might need to be used in a specific way when running blast.
-As an *example*:
-```
--outfmt "6 qseqid sseqid evalue pident stitle staxids sscinames scomnames sblastnames sskingdoms salltitles stitle" \
-```
-
---------
-
-## Creating the phycocosm aa blastx db:
-
-use the script in:
-```
-/data/davis--blast-dbs/get_jgi_genomes-release
-```
-
-to do the following:
-```
-cd /databases/blast/
-sudo mkdir phycocosm-proteins
-sudo chmod a+rw phycocosm-proteins/
-```
-
-sign in and then download all phycocosm protein sequences:
-```
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -a -l
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes   -c signon.cookie -a
-```
-
-download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
-```
-wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
-mv download-group\?flt\= all_org_names_and_taxa.csv
-```
-NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
-paste from the web link into the file.
-
-Create a single fasta file from all sep fasta files:
-```
-cd pep
-for f in `ls`; do gunzip $f; done
-cat * > ../concatted-phycocosm-proteins.fasta
-cd ../
-```
-
-prepare them as a blastdb with tax ids and appropriately formatted fa headers with seq id and taxa (this is possible attempt one of many because of the fasta headers)
-```
-python make_tax_id_map.py
-python format_fa_headers_for_blast.py
-mkdir output
-```
-
-Build the blastdb:
-```
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in concatted-phycocosm-proteins.fasta -parse_seqids -blastdb_version 5 -title "jgi-phycocosm-prot" -out output/jgi-phycocosm-prot -taxid_map tax_map.txt -dbtype prot
-```
-
-ok so actually, after much experimentation I decided to not run the above makeblastdb command.
-There were too many cryptic errors no matter how I tried to format the fasta headers and/or the tax_map.txt file to
-accommodate these.
-Instead, I ran the following command (i.e. I didnt tell blast to expect ncbi std formatted headers - the advice I've come across most often
- is to omit this if the files arent already in the ncbi format because its a headache).
-
-```
- /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in ../concatted-phycocosm-proteins.fasta -blastdb_version 5 -title "jgi-phycocosm-prot" -out jgi-phycocosm-prot -dbtype prot -max_file_sz '4GB'
-```
-The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
-
-To test the blast output format generated:
-```
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/blastx \
--db /home/ec2-user/jbconnect/blastdb/phycocosm-prot/jgi-phycocosm-prot \
--query /home/ec2-user/jbconnect/blastdb/tmp/ \
-76-jgi-phycocsm-original-blastx-job-blastx-query-seq.fasta \
--outfmt '7 qaccver sseqid saccver qstart qend sstart send sseq evalue bitscore length pident nident mismatch gapopen staxid ssciname scomname stitle' -out /home/ec2-user/jbconnect/blastdb/tmp/test-jgi-phycocsm-blastx-job-blastx-results.tsv
-```
-
------------
-
-## Mycocosm steps:
-```
-cd /databases/blast/
-mkdir mycocosm-proteins
-sudo chmod a+rw mycocosm-proteins/
-cd mycocosm-proteins
-```
-sign in and then download all phycocosm protein sequences:
-```
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f -l
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -f
-```
-
-download all phycocosm/mycocosm taxon ids (this link was acquired via email query to JGI on oct 18th):
-```
-wget https://mycocosm.jgi.doe.gov/ext-api/mycocosm/catalog/download-group?flt=&seq=all&pub=all&grp=all&srt=released&ord=desc
-mv download-group\?flt\= all_org_names_and_taxa.csv
-```
-NB: note that the above file might throw encoding errors in the subsequent step so you might need to manually select all, copy and
-paste from the web link into the file.
-
-install gnu parallel (easy):
-```
-http://git.savannah.gnu.org/cgit/parallel.git/tree/README
-```
-
-Create a single fasta file from all sep fasta files and format their headers at the same time:
-```
-cd pep
-for f in `ls`; do gunzip $f; done
-cd ../
-python format-and-build-fa.py
-```
-OOOOORRRRR.... run the same script in parallel much faster (preferred choice in theory but it seems to be way too slow so maybe stick with normal execution if this at first seems slow (dont increase -j here rhough!)):
-```
-for f in `ls pep/*.aa.fasta`; do echo "python format-and-build-fa.py ${f}"; done | parallel -j 6 -k
-```
-
-then concat all these temp files into a single fasta:
-```
-cat tmp_files/*.aa.fasta.tmp > concatted-mycocosm.formatted.fasta
-```
-
-Build the blastdb:
-```
-mkdir output
-cd output
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
--in ../concatted-mycocosm.formatted.fasta -blastdb_version 5 \
--title "jgi-mycocosm-prot" -out jgi-mycocosm-prot \
--dbtype prot -max_file_sz '4GB'
-```
-
-
-The workflow script just needs to be formatted to parse out the extra info from the result/subject ids now.
-
-a workflow script was created in the usual place (jbconnect/node_modules/blastx-../workflows/...py and softlinked into jbconnect/workflows
-and the above blast db was softlinked into the uisual place: jbconnect/blastdb/
-
-Tested successfully in app.
-Complete.
-
-
------------
-
-## JGI Phytozome steps:
-```
-cd /databases/blast
-sudo mkdir phytozome12-proteins
-sudo chmod a+rw phytozome12-proteins/
-cd phytozome12-proteins
-
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -u davistodt@gmail.com -p {w3...}
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12 -l
-/data/davis--blast-dbs/get_jgi_genomes-release/bin/get_jgi_genomes -c signon.cookie -P 12
-```
-
-download all phycocosm/mycocosm taxon ids (this was acquired via new email query to JGI answered on oct 20th by David Goodstein):
-```
-cd PhytozomeV12
-curl -X GET "https://phytozome-next.jgi.doe.gov/api/db/properties/proteome/456%2C502%2C281%2C461%2C227%2C325%2C228%2C229%2C231%2C317%2C539%2C538%2C320%2C318%2C310%2C522%2C521%2C676%2C91%2C572%2C291%2C531%2C566%2C322%2C459%2C548%2C392%2C382%2C309%2C692%2C575%2C453%2C388%2C494%2C589%2C467%2C689%2C256%2C506%2C553%2C505%2C551%2C451%2C390%2C514%2C691%2C448%2C686%2C297%2C457%2C530%2C679%2C673%2C492%2C122%2C501%2C677%2C675%2C275%2C508%2C678%2C510%2C509%2C571%2C567%2C491%2C285%2C580%2C581%2C563%2C442%2C670%2C534%2C298%2C687%2C385%2C573%2C562%2C561%2C588%2C469%2C540%2C545%2C544%2C541%2C558%2C543%2C559%2C507%2C200%2C305%2C520%2C671%2C445%2C210%2C444%2C533%2C532%2C119%2C289%2C519%2C518%2C449%2C113%2C233%2C523%2C472%2C264%2C384%2C167%2C447%2C278%2C266%2C474%2C470%2C484%2C585%2C482%2C489%2C582%2C483%2C173%2C485%2C478%2C476%2C477%2C473%2C574%2C486%2C479%2C446%2C277%2C481%2C488%2C487%2C480%2C584%2C475%2C471%2C583%2C526%2C529%2C458%2C527%2C524%2C221%2C525%2C182%2C154%2C565%2C586%2C321%2C498%2C504%2C550%2C587%2C304%2C290%2C324%2C668%2C462%2C386%2C323%2C499%2C680%2C503%2C296%2C463%2C577%2C316%2C490%2C314%2C556%2C549%2C460%2C537%2C515%2C283%2C337%2C343%2C364%2C379%2C336%2C369%2C356%2C333%2C381%2C359%2C372%2C355%2C349%2C362%2C353%2C331%2C361%2C378%2C346%2C328%2C344%2C374%2C380%2C357%2C363%2C352%2C334%2C365%2C345%2C376%2C367%2C354%2C370%2C329%2C348%2C358%2C338%2C366%2C339%2C375%2C351%2C342%2C330%2C368%2C347%2C377%2C350%2C373%2C335%2C326%2C360%2C340%2C371%2C341%2C332%2C327%2C560%2C497%2C450%2C516%2C672%2C312%2C311%2C500%2C454%2C564%2C552%2C468%2C669%2C493%2C681%2C682%2C683%2C443%2C513%2C684%2C512%2C685%2C308%2C495%2C590%2C496%2C591?format=tsv" -H "accept: application/json"  > all_orgs_and_taxids.tsv
-NB to note: we filter out the ones that are "restricted" in the python formatting script
-
-cd pep
-for f in `ls`; do gunzip $f; done
-cd ..
-
-format fasta headers of files and concat into one fasta:
-python format-and-build-fa.py
-
-build blastdb:
-mkdir output
-cat tmp_files/*.tmp > concatted-phytozome.formatted.fasta
-cd output
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
--in ../concatted-phytozome.formatted.fasta -blastdb_version 5 \
--title "jgi-phytozome-prot" -out jgi-phytozome-prot \
--dbtype prot
-```
-
-then add the relevant workflow scripts to the blastx plugin dir and
-symlink into jbconnect workflows, like followed in one of the above process.
-
------
-## Build EBI bacterial blastx db steps:
-
-```
-cd /databases/blast
-sudo mkdir ebi-bacterial
-sudo chmod a+rw ebi-bacterial/
-cd ebi-bacterial/
-```
-
-Download table with ALL bacterial assemblies from EBI (this command was built using the webportal available at: https://www.ebi.ac.uk/ena/browser/)
-```
-curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'result=assembly&query=tax_tree(2)&fields=accession%2Cassembly_title%2Cstudy_description%2Cscientific_name%2Ctax_id&limit=0&format=tsv' "https://www.ebi.ac.uk/ena/portal/api/search" > all_bacterial_accessions_taxon_2.tsv
-```
-Nevermind, scratch that. The EBI bacterial data portal does not have protein sequences.
-Instead, we used ensembl bacterial portal and went to the download section, i.e: https://bacteria.ensembl.org/info/data/ftp/index.html
-
-So:
-```
-cd ../
-sudo mkdir ensembl-bacteria
-sudo chmod a+rw ensembl-bacteria/
-cd ensembl-bacteria
-rsync --list-only -av --include='**/pep/*' rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ . | grep "/pep/" | sed "s|^.* bacteria_|bacteria_|g" > file_list_to_dl.txt
-```
-
-which gives this example output (sample only):
-```
-head -n 3 file_list_to_dl.txt
-bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/Acinetobacter_baumannii_aye_gca_000069245.ASM6924v1.pep.all.fa.gz
-bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/CHECKSUMS
-bacteria_0_collection/acinetobacter_baumannii_aye_gca_000069245/pep/README
-```
-
-Then use this file in the rsync cmd (I tried various combinations of --include-pattern and --exclude-pattern to no avail btw):
-```
-rsync -avrP --files-from=file_list_to_dl.txt rsync://ftp.ensemblgenomes.org/all/pub/bacteria/current/fasta/ .
-```
-note that you might need to run with the flag if rsync crashes with a weird error (its due to high mem/cpu usage on the machine even though it doesnt sound like it):
-```
---bwlimit=6000
-```
-
-```
-mkdir downloaded
-mv * downloaded
-mv downloaded/file_list_to_dl.txt .
-```
-
-format fasta headers (and bring in info from the file name into the header):
-```
-(no need to unzip fasta files)
-python format-fa-headers.py
-```
-
-build blastdb:
-```
-mkdir blastdb_output
-```
-(the following is needed because a simple ls or cat will fail with so many files found:)
-```
-find output/ -name '*.tmp' -print0 | xargs -0 cat > concatted-ensemble-bacteria.formatted.fasta
-(note that the above file is massive: about 76GB; so we will delete it when done)
-```
-
-```
-cd blastdb_output
-/data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb \
--in /databases/blast/ensembl-bacteria/concatted-ensemble-bacteria.formatted.fasta -blastdb_version 5 \
--title "ens-bacteria-prot" -out ens-bacteria-prot \
--dbtype prot
-
-rm concatted-ensemble-bacteria.formatted.fasta
-touch concatted-ensemble-bacteria.formatted.fasta.was.removed.due.to.size--regenerate-it-with-cat
-```
-
-NB!! there is a chance the whole db was not moved over as the connection broke
-(instead of the abopve cmd,
-I actually built the db in /blastdb, deleted the concatted fasta file, and moved it back to
-the working dir of /databases/blast/ens....
-Now since I deleted the concatted fasta (which took long to build), it would be difficult to
-rebuild (since I am pretty sure that the whole dir was indeed copied) - its low risk but
-bear in mind in case any weird results later on. Also, it **did** run the above touch cmd
-automatically (i pasted it and ran it during the execution, so once the first cmd finished then it
-would only have run the touch cmd, which it did).
 
 ------------------------------------------------------
 ## Installing sequenceserver
@@ -541,23 +562,6 @@ to restart the server in future, you just rerun:
 sequenceserver
 ```
 
-------------------------------------------------------------------------------------------
-## I think this was the cmd to add the repeat mnasker track:
-
-```
-./bin/flatfile-to-json.pl --gff data/Kappaphycus_alvarezii/repeat_masker/Kappaphycus_alvarezii.fasta.out.gff3 --trackLabel "Repeat Masker" --key "Repeat Masker" --out data/Kappaphycus_alvarezii --nameAttributes "Target,Repeat_Class,Position_in_repeat_begin,Position_in_repeat_end,Perc_div,Perc_del,Perc_ins"
-```
-
-------------------------------------------------------------------------------------------
-## I think this was the cmd used to build the current (soon to be replaced) annotation track
-
-```
-some cmd here to add gff
-```
-
-```
-./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii --mem 1200000000 --workdir /blastdb/tmp/ --incremental
-```
 
 ------------------------------------------------------------------------------------------
 ## Rough steps taken to REBUILD non-working phycocosm blastn db (this is an abbreviated version)
@@ -629,7 +633,7 @@ data/transcriptome/redalgae-guided.fasta \
 --trackLabel "Guided Transcriptome assembly" \
 --key "Guided Transcriptome assembly"
 
-(--indexed_fasta did not work in borwser!)
+(note that --indexed_fasta did not work in borwser!)
 ```
 
 ------------------------------------------------------------------------------------------
@@ -647,8 +651,9 @@ cd /scratch/projects/c026/algea/transcriptome_Meik/03_annotation
 scp -i deleteme.txt -r recommended scp -i /scratch/ftp/user2046/deleteme.txt -r recommended ec2-user@52.90.88.45:/large-store/annotations/transcriptome_assembly_meik/03_annotation
 ```
 
-then back to the aws server from now on, move the other transcriptome files to live closer to these (note that this will break softklinks in the app but we dont care
-about them because we are going to rather re-add these as an entirely new ref sequnce in the app.
+then back to the aws server from now on, move the other transcriptome files to live closer to these 
+(note that this will break softlinks in the app but we dont care
+about them because we are going to rather re-add these as an entirely new ref sequence in the app.
 
 ```
 cd ..
@@ -764,7 +769,7 @@ I then restarted the server and can confirm that it works after these changes.
       }
 
 
-random backup of traclist.json oct 22:
+random backup of trackList.json oct 22:
 ------
 {
     "bpSizeLimit": 25000,
@@ -1109,3 +1114,431 @@ random backup of traclist.json oct 22:
 }
 
 ------
+
+
+nov11 copy paste of ka trans config that i had before closing and opening another one:
+
+{
+   "formatVersion" : 1,
+   "tracks" : [
+      {
+         "category" : "Reference sequence",
+         "chunkSize" : 20000,
+         "key" : "De novo transcriptome assembly",
+         "label" : "De novo transcriptome assembly",
+         "seqType" : "dna",
+         "storeClass" : "JBrowse/Store/Sequence/StaticChunked",
+         "type" : "SequenceTrack",
+         "urlTemplate" : "seq/{refseq_dirpath}/{refseq}-"
+      },
+      {
+         "category" : "Annotations",
+         "compress" : 0,
+         "key" : "Annotated genes - transcriptome",
+         "label" : "Annotated genes - transcriptome",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature"
+         },
+         "trackType" : null,
+         "type" : "FeatureTrack",
+         "urlTemplate" : "tracks/Annotated genes - transcriptome/{refseq}/trackData.json"
+      },
+      {
+         "category" : "Annotations",
+         "compress" : 0,
+         "key" : "Annotated genes - transcriptome",
+         "label" : "Annotated genes - transcriptome",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature"
+         },
+         "subParts" : "gene,mRNA,five_prime_UTR,exon,CDS,three_prime_UTR",
+         "transcriptType": "mRNA",
+         "trackType" : null,
+         "type" : "CanvasFeatures",
+         "urlTemplate" : "tracks/Annotated genes - transcriptome/{refseq}/trackData.json"
+      },
+      {
+         "compress" : 0,
+         "key" : "Blastx UniProt results",
+         "label" : "Blastx UniProt results",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature"
+         },
+         "trackType" : null,
+         "type" : "FeatureTrack",
+         "urlTemplate" : "tracks/Blastx UniProt results/{refseq}/trackData.json"
+      },
+      {
+         "compress" : 0,
+         "key" : "Pfam domain results",
+         "label" : "Pfam domain results",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature"
+         },
+         "trackType" : null,
+         "type" : "FeatureTrack",
+         "urlTemplate" : "tracks/Pfam domain results/{refseq}/trackData.json"
+      }
+   ]
+}
+
+
+nov11 copy paste of ka genome config that i had before closing and opening another one:
+{
+    "bpSizeLimit": 20000,
+    "dataset_id": "Kappaphycus_alvarezii",
+    "formatVersion": 1,
+    "include": [
+        "/track/get_tracklist?dataset=data/Kappaphycus_alvarezii"
+    ],
+    "names": {
+        "type": "Hash",
+        "url": "names/"
+    },
+    "plugins": [
+        "HideTrackLabels",
+        "NeatCanvasFeatures",
+        "NeatHTMLFeatures",
+        "JBAnalyze",
+        "JBClient",
+        "JBCdemo",
+        "JBlast",
+        "blastx"
+    ],
+    "tracks": [
+        {
+            "category": "Reference sequence",
+            "chunkSize": 20000,
+            "key": "Reference sequence",
+            "label": "DNA",
+            "seqType": "dna",
+            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+            "type": "SequenceTrack",
+            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757333",
+            "label": "SRR2757333",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360608; Run acn: SRR2757333]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757333.bam"
+        },
+        {
+            "category": "RNAseq alignments / Illumina HiSeq 2000 paired end sequencing",
+            "key": "ERR2041141",
+            "label": "ERR2041141",
+            "metadata": {
+                "description": "Illumina HiSeq 2000 paired end sequencing [SRA project acn: ERP023948; Experiment acn: ERX2100198; Run acn: ERR2041141]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/ERR2041141.bam"
+        },
+        {
+            "category": "RNAseq alignments / De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae- Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis",
+            "key": "SRR1763039",
+            "label": "SRR1763039",
+            "metadata": {
+                "description": "De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae, Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis [SRA project acn: SRP052519; Experiment acn: SRX845433; Run acn: SRR1763039]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1763039.bam"
+        },
+        {
+            "category": "RNAseq alignments / Transcriptome sequencing and characterization for Kappaphycus alvarezii",
+            "key": "SRR1207056",
+            "label": "SRR1207056",
+            "metadata": {
+                "description": "Transcriptome sequencing and characterization for Kappaphycus alvarezii (Doty) [SRA project acn: SRP040669; Experiment acn: SRX502687; Run acn: SRR1207056]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1207056.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757332",
+            "label": "SRR2757332",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360503; Run acn: SRR2757332]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757332.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757334",
+            "label": "SRR2757334",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360622; Run acn: SRR2757334]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757334.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757335",
+            "label": "SRR2757335",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360666; Run acn: SRR2757335]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757335.bam"
+        },
+        {
+            "category": "RNAseq alignments / TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS",
+            "key": "SRR2757337",
+            "label": "SRR2757337",
+            "metadata": {
+                "description": "TRANSCRIPTOMIC AND CARRAGEENAN ANALYSES OF MICROPROPAGATED KAPPAPHYCUS AND EUCHEUMA SEAWEEDS UNDER DIFFERENT LIGHT REGIMES AND CARBON DIOXIDE CONCENTRATIONS [SRA project acn: SRP065060; Experiment acn: SRX1360673; Run acn: SRR2757337]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR2757337.bam"
+        },
+        {
+            "category": "RNAseq alignments / Transcriptome of Kappaphycus alvarezii",
+            "key": "SRR5357790",
+            "label": "SRR5357790",
+            "metadata": {
+                "description": "Transcriptome of Kappaphycus alvarezii [SRA project acn: SRP102128; Experiment acn: SRX2653631; Run acn: SRR5357790]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR5357790.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466463",
+            "label": "SRR6466463",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556421; Run acn: SRR6466463]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466463.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466464",
+            "label": "SRR6466464",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556420; Run acn: SRR6466464]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466464.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466465",
+            "label": "SRR6466465",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556419; Run acn: SRR6466465]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466465.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466466",
+            "label": "SRR6466466",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556418; Run acn: SRR6466466]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466466.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-seq of Kappaphycus alvarezii",
+            "key": "SRR6466467",
+            "label": "SRR6466467",
+            "metadata": {
+                "description": "RNA-seq of Kappaphycus alvarezii [SRA project acn: SRP128943; Experiment acn: SRX3556417; Run acn: SRR6466467]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR6466467.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus Alvarezii-Wild type",
+            "key": "SRR7637208",
+            "label": "SRR7637208",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus Alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500752; Run acn: SRR7637208]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637208.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus Alvarezii-Wild type",
+            "key": "SRR7637235",
+            "label": "SRR7637235",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus Alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500779; Run acn: SRR7637235]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637235.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637249",
+            "label": "SRR7637249",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500793; Run acn: SRR7637249]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637249.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-Wild type",
+            "key": "SRR7637250",
+            "label": "SRR7637250",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: Wild type [SRA project acn: SRP156108; Experiment acn: SRX4500794; Run acn: SRR7637250]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637250.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637252",
+            "label": "SRR7637252",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500796; Run acn: SRR7637252]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637252.bam"
+        },
+        {
+            "category": "RNAseq alignments / RNA-Seq of Kappaphycus alvarezii-tissue culture",
+            "key": "SRR7637253",
+            "label": "SRR7637253",
+            "metadata": {
+                "description": "RNA-Seq of Kappaphycus alvarezii: tissue culture [SRA project acn: SRP156108; Experiment acn: SRX4500797; Run acn: SRR7637253]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR7637253.bam"
+        },
+        {
+            "category": "RNAseq alignments / Marine Maroalga Kappaphycus alvarezii transcriptome under low temperature",
+            "key": "SRR1762980",
+            "label": "SRR1762980",
+            "metadata": {
+                "description": "Marine Maroalga Kappaphycus alvarezii transcriptome under low temperature [SRA project acn: SRP052517; Experiment acn: SRX845400; Run acn: SRR1762980]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1762980.bam"
+        },
+        {
+            "category": "RNAseq alignments / De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae- Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis",
+            "key": "SRR1763037",
+            "label": "SRR1763037",
+            "metadata": {
+                "description": "De novo sequencing and comparative of Kappaphycus alvarezii (Solieriaceae, Rhodophyta) under three different temperatures to discover putative genes associated with photosynthesis [SRA project acn: SRP052518; Experiment acn: SRX845422; Run acn: SRR1763037]"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BAM",
+            "type": "JBrowse/View/Track/Alignments2",
+            "urlTemplate": "../bam/SRR1763037.bam"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 80% identities, min 50bp",
+            "label": "Blastx, 80% identities, min 50bp",
+            "metadata": {
+                "description": "Blastx, 80% identities, min 50bp"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_80pc_50bp.bed.gz.tbi",
+            "trackId": "Annotation_blastx_80pc_50bp",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_80pc_50bp.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 80% identities, min 75% length",
+            "label": "Blastx, 80% identities, min 75% length",
+            "metadata": {
+                "description": "Blastx, 80% identities, min 75% length"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_80pc_75pc.bed.gz.tbi",
+            "trackId": "Annotation_blastx_80pc_75",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_80pc_75pc.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 90% identities, min 50bp",
+            "label": "Blastx, 90% identities, min 50bp",
+            "metadata": {
+                "description": "Blastx, 90% identities, min 50bp"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_90pc_50bp.bed.gz.tbi",
+            "trackId": "Annotation_blastx_90pc_50bp",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_90pc_50bp.bed.gz"
+        },
+        {
+            "category": "Pre-computed BLAST tracks",
+            "key": "Blastx, 90% identities, min 75% length",
+            "label": "Blastx, 90% identities, min 75% length",
+            "metadata": {
+                "description": "Blastx, 90% identities, min 75% length"
+            },
+            "storeClass": "JBrowse/Store/SeqFeature/BEDTabix",
+            "tbiUrlTemplate": "../bed/sorted_90pc_75pc.bed.gz.tbi",
+            "trackId": "Annotation_blastx_90pc_75pc",
+            "type": "CanvasFeatures",
+            "urlTemplate": "../bed/sorted_90pc_75pc.bed.gz"
+        },
+        {
+            "category": "Annotations",
+            "compress": 0,
+            "key": "Gene functional annotations",
+            "label": "Gene functional annotations",
+            "storeClass": "JBrowse/Store/SeqFeature/NCList",
+            "style": {
+                "className": "feature"
+            },
+            "trackType": null,
+            "type": "FeatureTrack",
+            "urlTemplate": "tracks/Gene functional annotations full - all rows (added by script to K. alva subdir of data)/{refseq}/trackData.json"
+        },
+        {
+            "category": "Annotations",
+            "compress": 0,
+            "key": "Repeat Masker",
+            "label": "Repeat Masker",
+            "storeClass": "JBrowse/Store/SeqFeature/NCList",
+            "style": {
+                "className": "feature"
+            },
+            "trackType": null,
+            "type": "FeatureTrack",
+            "urlTemplate": "tracks/Repeat Masker/{refseq}/trackData.json"
+        }
+    ]
+}
