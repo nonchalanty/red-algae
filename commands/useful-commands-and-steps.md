@@ -751,6 +751,250 @@ Then try rerunning the crashed script:
 It ran to completion.
 I then restarted the server and can confirm that it works after these changes.
 
+
+Then I removed the old, wrong trans assembly tracks which were under the ka genome view.
+In the ka tracklist.json file I deleted the following two tracks:
+```bash
+,
+        {
+            "category": "Reference sequence",
+            "chunkSize": 20000,
+            "key": "De novo Transcriptome assembly",
+            "label": "De novo Transcriptome assembly",
+            "seqType": "dna",
+            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+            "type": "SequenceTrack",
+            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-"
+        },
+        {
+            "category": "Reference sequence",
+            "chunkSize": 20000,
+            "key": "Guided Transcriptome assembly",
+            "label": "Guided Transcriptome assembly",
+            "seqType": "dna",
+            "storeClass": "JBrowse/Store/Sequence/StaticChunked",
+            "type": "SequenceTrack",
+            "urlTemplate": "seq/{refseq_dirpath}/{refseq}-"
+        }
+```
+Remember that these were manually removed in future, if the indexing thing
+gives us cases where you get search results for something not meant to be 
+there.
+
+Note that the following was the original track created now from the above steps to add
+the tra gene annotation track. It looked nice in terms of colour and name of the 
+track being diplayed next to each feature but it only showed genes, not exons etc below 
+the genes:
+
+```bash
+      {
+         "compress" : 0,
+         "category": "Annotations",
+         "key" : "Annotated genes - transcriptome",
+         "label" : "Annotated genes - transcriptome",
+         "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+         "style" : {
+            "className" : "feature"
+         },
+         "trackType" : null,
+         "type" : "FeatureTrack",
+         "urlTemplate" : "tracks/Annotated genes - transcriptome/{refseq}/trackData.json"
+      }
+```
+
+Ok so I ended up moving on, I couldnt seem to get the subfeatures to all display 
+independently, despite using the same config settings as the main ka tracklist.json config.
+
+
+Ok, now to add the uniprot blastx hits.
+```
+cd /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended
+```
+
+nano and add this line to the top of the uniprot hits gff file:
+```
+##gff-version 3
+```
+
+then go back, link the file and attempt to add as a track using flatfile to json:
+``` 
+cd -
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/uniprot_hits.gff3 \
+--trackLabel "Blastx UniProt results" \
+--key "Blastx UniProt results" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name,Parent," --sortMem 109715200 --maxLookback 100
+
+```
+
+It worked perfectly. 
+Now lets add the other annotation, the pfam one:
+
+```
+cd /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended
+```
+
+nano and add this line to the top of the uniprot hits gff file:
+```
+##gff-version 3
+```
+
+then go back, link the file and attempt to add as a track using flatfile to json:
+``` 
+cd -
+cd data/transcriptome
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/pfam.gff3 .
+cd ../..
+
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/pfam.gff3 \
+--trackLabel "Pfam domain results" \
+--key "Pfam domain results" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name,Parent," --sortMem 109715200 --maxLookback 100
+```
+
+It seemed to finish successfully but yet in the borwser the track has zero features...
+
+
+------------------------------------------------------------------------------------------
+## [2021-11-15] Steps to re-add meiks transcriptome reference + **annotations**
+
+view our available files that we might want to add (once you've copied them here):
+```
+ls /large-store/annotations/transcriptome_assembly_meik/03_annotation/
+```
+
+index fasta (if not done already):
+```
+samtools faidx data/transcriptome/redalgae-denovo.fasta
+```
+
+build ref using script:
+```
+date && \
+./bin/prepare-refseqs.pl --fasta \
+data/transcriptome/redalgae-denovo.fasta \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--trackLabel "De novo transcriptome assembly" \
+--key "De novo transcriptome assembly" \
+&& date
+```
+
+Add the following code block to jbrowse.conf:
+`` 
+[datasets.Kappaphycus_alvarezii_transcriptome]
+url  = ?data=data/Kappaphycus_alvarezii_transcriptome
+name = Kappaphycus alvarezii Transcriptome
+``
+
+Add the following line to the trascriptomes trackList.json file:
+
+``` 
+   "dataset_id": "Kappaphycus_alvarezii_transcriptome",
+
+```
+
+add the gene annotation track:
+```
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/transcripts.formatted.gff3 \
+--trackLabel "Annotated genes - transcriptome" \
+--key "Annotated genes - transcriptome" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name" \
+--sortMem 109715200 \
+--maxLookback 100 \
+&& date
+```
+
+
+
+---------------------------------------
+## [2021-11-11] Replacing Juans repeat masker track with new one
+
+NB: moved the entire juans annotations folder to the large store so that we can keep
+everything in one place. Important to remember if things dont work right in the app!!
+
+``` 
+cd /large-store/annotations/
+mv /data/juans-annotations .
+cd /data
+ln -s /large-store/annotations/juans-annotations .
+cd /large-store/annotations/juans-annotations
+mkdir nov9th-version
+cd nov9th-version
+mkdir repeat_masker
+cd repeat_masker
+wget -O Kappaphycus_alvarezii_repeats.gff.gz https://www.dropbox.com/s/a5jv4685x6eqb21/Kappaphycus_alvarezii_repeats.gff.gz?dl=1
+```
+
+Upon inspection, it looks like the "new" file above has no more information
+than what I already annotated my old repeat file with. So I'm going to continue
+leaving it as is and NOT replace the old track with this new one above.
+
+---------------------------------------
+## [2021-11-11] Replacing Juans annotation track with new one from nov9th
+
+download all new files:
+``` 
+cd /large-store/annotations/juans-annotations/nov9th-version
+wget -O Kappaphycus_alvarezii_cdna_v2.fasta.gz https://www.dropbox.com/s/7s8cyn52uxmupe2/Kappaphycus_alvarezii_cdna_v2.fasta.gz?dl=1
+wget -O Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz https://www.dropbox.com/s/6smc8cf1450suxl/Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz?dl=0
+
+```
+
+
+
+--------
+[2021-11-11] Trying to fix broken app
+
+```
+./bin/generate-names.pl --verbose --out data/Kappaphycus_alvarezii_transcriptome --mem 1200000000 --workdir /blastdb/tmp/ --incremental
+```
+
+Above didnt help.
+
+Trying to clear up space on "/" (only 200mb free space):
+(NB: in case one or two bam files have any issues displaying later down the line, 
+consider checking that no links were broken from the below changes).
+```
+1020  cd /data/
+ 1021  unlink ERR2041141.bam
+ 1022  df -h
+ 1023  mv /davis-data/bams-moved-from-root-data-dir/ERR2041141.bam .
+ 1024  ll ERR2041141.bam
+ 1025  md5sum ERR2041141.bam
+ 1026  md5sum /davis-data/bams-moved-from-root-data-dir/ERR2041141.bam
+ 1027  sudo rm /davis-data/bams-moved-from-root-data-dir/ERR2041141.bam
+ 1028  df -h
+ 1029  ll /davis-data/bams-moved-from-root-data-dir/
+ 1030  ll | grep "SRR1207056.b"
+ 1031  unlink SRR1207056.bam
+ 1032  cp /davis-data/bams-moved-from-root-data-dir/SRR1207056.bam .
+ 1033  md5sum /davis-data/bams-moved-from-root-data-dir/SRR1207056.bam
+ 1034  md5sum SRR1207056.bam
+ 1035  rm /davis-data/bams-moved-from-root-data-dir/SRR1207056.bam
+ 1036  sudo rm /davis-data/bams-moved-from-root-data-dir/SRR1207056.bam
+```
+
+Tested the above. Doesnt seem that it was a disk space issue.
+
+Then also tried to "delete" all traces of the transcriptome reference 
+dataset track because this issue never used to happen before we added the transcriptome
+annotation track pFam. So going to try this and then try re-add it all in another test afterwards.
+
+```
+cd into jbrowse directory
+mkdir /large-store/temp/
+cp -r Kappaphycus_alvarezii_transcriptome /large-store/temp/Kappaphycus_alvarezii_transcriptome
+rm -r Kappaphycus_alvarezii_transcriptome/seq
+rm -r Kappaphycus_alvarezii_transcriptome/
+then also remove mention of this reference from jbrowse.conf
+```
+
 ---------------------------------------------------------
 ---------------------------------------------------------
 # Random [IGNORE]
