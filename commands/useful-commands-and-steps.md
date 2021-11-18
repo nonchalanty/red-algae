@@ -637,7 +637,7 @@ data/transcriptome/redalgae-guided.fasta \
 ```
 
 ------------------------------------------------------------------------------------------
-## Stesp to copy meiks transcriptome **annotations** across to ec2 instance and REDO the adding of transcriptome reference sequence as a new ref seq to the app + adding all annotation files
+## Steps to copy meiks transcriptome **annotations** across to ec2 instance and REDO the adding of transcriptome reference sequence as a new ref seq to the app + adding all annotation files
 
 first mkdirs:
 ```
@@ -816,7 +816,7 @@ nano and add this line to the top of the uniprot hits gff file:
 ##gff-version 3
 ```
 
-then go back, link the file and attempt to add as a track using flatfile to json:
+then go back, link the file (not shown here!) and attempt to add as a track using flatfile to json:
 ``` 
 cd -
 ./bin/flatfile-to-json.pl \
@@ -855,62 +855,16 @@ cd ../..
 --nameAttributes "ID,Name,Parent," --sortMem 109715200 --maxLookback 100
 ```
 
-It seemed to finish successfully but yet in the borwser the track has zero features...
+It seemed to finish successfully but yet in the browser the track has zero features...
+I realised that this is because its mapped to peptide sequence, not nucleotide, so we
+shouldn't really have it as a track here. We wont add it in the new iteration.
 
 
-------------------------------------------------------------------------------------------
-## [2021-11-15] Steps to re-add meiks transcriptome reference + **annotations**
-
-view our available files that we might want to add (once you've copied them here):
-```
-ls /large-store/annotations/transcriptome_assembly_meik/03_annotation/
-```
-
-index fasta (if not done already):
-```
-samtools faidx data/transcriptome/redalgae-denovo.fasta
-```
-
-build ref using script:
-```
-date && \
-./bin/prepare-refseqs.pl --fasta \
-data/transcriptome/redalgae-denovo.fasta \
---out data/Kappaphycus_alvarezii_transcriptome \
---trackLabel "De novo transcriptome assembly" \
---key "De novo transcriptome assembly" \
-&& date
-```
-
-Add the following code block to jbrowse.conf:
-`` 
-[datasets.Kappaphycus_alvarezii_transcriptome]
-url  = ?data=data/Kappaphycus_alvarezii_transcriptome
-name = Kappaphycus alvarezii Transcriptome
-``
-
-Add the following line to the trascriptomes trackList.json file:
-
-``` 
-   "dataset_id": "Kappaphycus_alvarezii_transcriptome",
-
-```
-
-add the gene annotation track:
-```
-date && \
-./bin/flatfile-to-json.pl \
---gff data/transcriptome/transcripts.formatted.gff3 \
---trackLabel "Annotated genes - transcriptome" \
---key "Annotated genes - transcriptome" \
---out data/Kappaphycus_alvarezii_transcriptome \
---nameAttributes "ID,Name" \
---sortMem 109715200 \
---maxLookback 100 \
-&& date
-```
+We then got that massive bug where the app takes forever to load. 
+So we deleted all traces of the transcr tracks and started again in the below section.
 
 
+We will revisit this and other tracks later on, once we have added the trans protein ref seq.
 
 ---------------------------------------
 ## [2021-11-11] Replacing Juans repeat masker track with new one
@@ -934,17 +888,6 @@ wget -O Kappaphycus_alvarezii_repeats.gff.gz https://www.dropbox.com/s/a5jv4685x
 Upon inspection, it looks like the "new" file above has no more information
 than what I already annotated my old repeat file with. So I'm going to continue
 leaving it as is and NOT replace the old track with this new one above.
-
----------------------------------------
-## [2021-11-11] Replacing Juans annotation track with new one from nov9th
-
-download all new files:
-``` 
-cd /large-store/annotations/juans-annotations/nov9th-version
-wget -O Kappaphycus_alvarezii_cdna_v2.fasta.gz https://www.dropbox.com/s/7s8cyn52uxmupe2/Kappaphycus_alvarezii_cdna_v2.fasta.gz?dl=1
-wget -O Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz https://www.dropbox.com/s/6smc8cf1450suxl/Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz?dl=0
-
-```
 
 
 
@@ -994,6 +937,356 @@ rm -r Kappaphycus_alvarezii_transcriptome/seq
 rm -r Kappaphycus_alvarezii_transcriptome/
 then also remove mention of this reference from jbrowse.conf
 ```
+
+------------------------------------------------------------------------------------------
+## [2021-11-15 DAVIS+ALEX TOGETHER] Steps to re-add meiks transcriptome reference + **annotations**
+
+Note that this section follows the above section, after deleting the transcr tracks.
+
+
+To view our available files that we might want to add (once you've copied them here):
+```
+ls /large-store/annotations/transcriptome_assembly_meik/03_annotation/
+```
+
+index fasta (if not done already):
+```
+samtools faidx data/transcriptome/redalgae-denovo.fasta
+```
+
+build ref using script:
+```
+date && \
+./bin/prepare-refseqs.pl --indexed_fasta \
+data/transcriptome/redalgae-denovo.fasta \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--trackLabel "De novo transcriptome assembly" \
+--key "De novo transcriptome assembly" \
+&& date
+```
+
+Add the following code block to jbrowse.conf to add this reference as a menu option in the browser:
+`` 
+[datasets.Kappaphycus_alvarezii_transcriptome]
+url  = ?data=data/Kappaphycus_alvarezii_transcriptome
+name = Kappaphycus alvarezii Transcriptome
+``
+
+Add the following line to the trascriptomes trackList.json file, at the top level:
+
+``` 
+   "dataset_id": "Kappaphycus_alvarezii_transcriptome",
+```
+
+add the gene annotation track:
+```
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/transcripts.formatted.gff3 \
+--trackLabel "Annotated genes - transcriptome" \
+--key "Annotated genes - transcriptome" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name" \
+--sortMem 109715200 \
+&& date
+```
+
+then add the (previously formatted) blastx hits file as a track using flatfile to json:
+``` 
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/uniprot_hits.gff3 \
+--trackLabel "Blastx UniProt results" \
+--key "Blastx UniProt results" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name," --sortMem 109715200 \
+&& date
+```
+
+All of the above up until here have now been tested and work.
+In my browser it seems to still be behaving slowly, but via phone and also tested by Alex, 
+it all works as expected.
+
+
+
+---------------------------------------
+## [2021-11-16/17] Adding Meik's 2 new tracks (unigene and interpro hits) 
+
+
+Then from within the cro server, we need to copy over the two new files to the aws (i.e. app server) server:
+```
+cd /scratch/projects/c026/algea/transcriptome_Meik/03_annotation
+scp -i /scratch/ftp/user2046/deleteme.txt recommended/interpro_hits.* ec2-user@52.90.88.45:/large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended
+scp -i /scratch/ftp/user2046/deleteme.txt -r unigene_annotated_264089 ec2-user@52.90.88.45:/large-store/annotations/transcriptome_assembly_meik/03_annotation/unigene_annotated_264089
+```
+
+Then back to the aws server from now on.
+
+Now, we want to see what fields are present inside the gff3 file that we might want to use for indexing.
+```
+less /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/interpro_hits.gff3
+```
+
+The following fields are currently present:
+```
+ID,Name,signature_desc,Dbxref,Ontology_term......
+```
+
+Lets make it as similar to juans old annotation as possible, i.e. we want at least the following fields in the gff3, probably others too:
+```
+Parent,Name,transcript_id,gene_id,pathway_term,Ontology_term,SUPERFAMILY_ID=
+```
+
+e.g.: `pathway_term=MetaCyc:PWY-1061,MetaCyc:PWY-1121,.......`
+e.g.: `pathway_term=Reactome:R-HSA-2408522,Reactome:R-HSA-379716,Reactome:R-HSA-379726,`
+e.g.: `Ontology_term=GO:0000166,GO:0004812,GO:0005524,GO:0006418;`
+e.g.: `SUPERFAMILY_ID=SSF47323 (Anticodon-binding domain of a subclass of class I aminoacyl-tRNA synthetases);`
+e.g.: `PANTHER_ID=PTHR10890 (CYSTEINYL-TRNA SYNTHETASE),PTHR10890:SF3 (CYSTEINE--TRNA LIGASE, CYTOPLASMIC);`
+e.g.: `Gene3D_DESCR=- (G3DSA:1.20.120.1910);`
+e.g.: `PANTHER_DESCR=CYSTEINE--TRNA LIGASE, CYTOPLASMIC (PTHR10890:SF3),CYSTEINYL-TRNA SYNTHETASE (PTHR10890);`
+e.g.: `SUPERFAMILY_DESCR=Anticodon-binding domain of a subclass of class I aminoacyl-tRNA synthetases (SSF47323)`
+
+
+Actually, we needed to write a script anyway to format the file, which gives us the above info as it runs:
+```
+python format-interpro-gff.py interpro_hits.gff3
+```
+
+which gave the following output:
+```
+DBS encountered (useful when adding flatfile as a jbrowse track):
+SUPERFAMILY_DESCR,CDD_ID,ProSitePatterns_ID,PANTHER_DESCR,ProSiteProfiles_DESCR,PIRSR_DESCR,Gene3D_DESCR,PANTHER_ID,SFLD_DESCR,TIGRFAM_ID,SMART_DESCR,SFLD_ID,Pfam_ID,Ontology_term,Gene3D
+_ID,CDD_DESCR,TIGRFAM_DESCR,Coils_DESCR,ProSitePatterns_DESCR,PRINTS_DESCR,MobiDBLite_DESCR,Coils_ID,pathway_term,MobiDBLite_ID,SMART_ID,SUPERFAMILY_ID,Pfam_DESCR,Hamap_ID,InterPro_ID,Ha
+map_DESCR,ProSiteProfiles_ID,PIRSF_ID,PRINTS_ID,PIRSF_DESCR,PIRSR_ID
+Out file written to: format-ips-file/interpro_hits.formatted.gff3.
+Total time: 0:02:53.817312
+Complete.
+```
+
+
+Therefore, the following fields will be used:
+```
+signature_desc
+```
+
+Now, add this newly formatted gff3 file as a track using flatfile to json:
+``` 
+cd data/transcriptome/
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/format-ips-file/interpro_hits.formatted.gff3 .
+cd ../..
+
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/interpro_hits.formatted.gff3 \
+--trackLabel "Gene annotation results (InterPro Scan)" \
+--key "Gene annotation results (InterPro Scan)" \
+--out data/Kappaphycus_alvarezii_transcriptome \
+--nameAttributes "ID,Name,SUPERFAMILY_DESCR,CDD_ID,ProSitePatterns_ID,PANTHER_DESCR,ProSiteProfiles_DESCR,PIRSR_DESCR,Gene3D_DESCR,PANTHER_ID,SFLD_DESCR,TIGRFAM_ID,SMART_DESCR,SFLD_ID,Pfam_ID,Ontology_term,Gene3D_ID,CDD_DESCR,TIGRFAM_DESCR,Coils_DESCR,ProSitePatterns_DESCR,PRINTS_DESCR,MobiDBLite_DESCR,Coils_ID,pathway_term,MobiDBLite_ID,SMART_ID,SUPERFAMILY_ID,Pfam_DESCR,Hamap_ID,InterPro_ID,Hamap_DESCR,ProSiteProfiles_ID,PIRSF_ID,PRINTS_ID,PIRSF_DESCR,PIRSR_ID" --sortMem 209715200 \
+&& date
+```
+
+NB: just realised that the above track was using peptide coordinates, NOT nucleotide coordinates...
+Therefore it maps successfully to the transcriptome assembly but its incorrect - the positions are meant to be for
+amino acids. So lets add a new reference seq for the peptides and rather add this track there. 
+
+
+
+---------------------------------------
+## [2021-11-17] Adding a new reference sequence just for protein (aa) + annotations (interpro + unigene)
+
+So, lets add a new amino acid reference sequence:
+```
+cd data/transcriptome
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/transcripts.faa .
+```
+
+index fasta:
+```
+samtools faidx data/transcriptome/transcripts.faa
+```
+
+build ref using script:
+```
+date && \
+./bin/prepare-refseqs.pl --indexed_fasta \
+data/transcriptome/transcripts.faa \
+--out data/Kappaphycus_alvarezii_transcriptome_protein \
+--trackLabel "De novo transcriptome assembly protein" \
+--key "De novo transcriptome assembly protein" \
+&& date
+```
+
+Add the following code block to jbrowse.conf to add this reference as a menu option in the browser:
+`` 
+[datasets.Kappaphycus_alvarezii_transcriptome_protein]
+url  = ?data=data/Kappaphycus_alvarezii_transcriptome_protein
+name = Kappaphycus alvarezii Transcriptome (Protein)
+``
+
+Add the following line to the new reference's trackList.json file, at the top level:
+
+``` 
+   "dataset_id": "Kappaphycus_alvarezii_transcriptome_protein",
+```
+
+
+Now add gff annotation as a track, using a similar cmd to what we tried to do when we added it incorrectly as a track to the transcriptome nucleotide sequence:
+```
+cd data/transcriptome/
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/recommended/format-ips-file/interpro_hits.aa.formatted.gff3 .
+cd ../..
+
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/interpro_hits.aa.formatted.gff3 \
+--trackLabel "De novo transcriptome assembly - protein annotation (InterPro Scan)" \
+--key "De novo transcriptome assembly - protein annotation (InterPro Scan)" \
+--out data/Kappaphycus_alvarezii_transcriptome_protein \
+--nameAttributes "ID,Name,Coils_ID,Hamap_ID,ProSiteProfiles_ID,Pfam_DESCR,pathway_term,ProSiteProfiles_DESCR,InterPro_ID,SMART_DESCR,SFLD_DESCR,PANTHER_DESCR,Pfam_ID,Gene3D_DESCR,SUPERFAMILY_ID,MobiDBLite_ID,PRINTS_ID,ProSitePatterns_DESCR,PRINTS_DESCR,Hamap_DESCR,PIRSR_ID,PANTHER_ID,TIGRFAM_ID,SMART_ID,ProSitePatterns_ID,PIRSF_DESCR,PIRSR_DESCR,MobiDBLite_DESCR,TIGRFAM_DESCR,SFLD_ID,Ontology_term,PIRSF_ID,SUPERFAMILY_DESCR,CDD_DESCR,Coils_DESCR,Gene3D_ID,CDD_ID" --sortMem 209715200 \
+&& date
+```
+
+Completed successfully and tested the app - this new page works.
+
+Now we can also add Meik's unigene annotation to this new aa reference:
+```
+cd /large-store/annotations/transcriptome_assembly_meik/03_annotation/unigene_annotated_264089
+python format-unigene.py redalgae-longest_orfs-85.pep.gff3
+
+which outputs:
+
+Wrote 20000 lines. Total so far: 4140000
+Databases (keys) encountered (useful when adding flatfile as a jbrowse track):
+Pfam_ID,TIGRFAM_DESCR,SMART_ID,MobiDBLite_DESCR,PIRSR_DESCR,PRINTS_ID,InterPro_ID,pathway_term,ProSitePatterns_DESCR,SUPERFAMILY_DESCR,Coils_ID,MobiDBLite_ID,ProSitePatterns_ID,CDD_DESCR,Ontology_term,SUPERFAMILY_ID,TIGRFAM_ID,Gene3D_DESCR,ProSiteProfiles_ID,PANTHER_ID,Gene3D_ID,Coils_DESCR,PIRSF_DESCR,Pfam_DESCR,PANTHER_DESCR,PRINTS_DESCR,Hamap_ID,ProSiteProfiles_DESCR,CDD_ID,Hamap_DESCR,SMART_DESCR,PIRSF_ID,SFLD_DESCR,PIRSR_ID,SFLD_ID
+Out file written to: format-ips-file/redalgae-longest_orfs-85.pep.formatted.gff3.
+Total time: 0:01:34.671508
+Complete.
+```
+
+Now add as track:
+```
+cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/transcriptome
+ln -s /large-store/annotations/transcriptome_assembly_meik/03_annotation/unigene_annotated_264089/format-unigene/redalgae-longest_orfs-85.pep.formatted.gff3 .
+cd ../..
+
+
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/redalgae-longest_orfs-85.pep.formatted.gff3 \
+--trackLabel "De novo transcriptome assembly - protein annotation (UniGene)" \
+--key "De novo transcriptome assembly - protein annotation (UniGene)" \
+--out data/Kappaphycus_alvarezii_transcriptome_protein \
+--nameAttributes "ID,Name,Pfam_ID,TIGRFAM_DESCR,SMART_ID,MobiDBLite_DESCR,PIRSR_DESCR,PRINTS_ID,InterPro_ID,pathway_term,ProSitePatterns_DESCR,SUPERFAMILY_DESCR,Coils_ID,MobiDBLite_ID,ProSitePatterns_ID,CDD_DESCR,Ontology_term,SUPERFAMILY_ID,TIGRFAM_ID,Gene3D_DESCR,ProSiteProfiles_ID,PANTHER_ID,Gene3D_ID,Coils_DESCR,PIRSF_DESCR,Pfam_DESCR,PANTHER_DESCR,PRINTS_DESCR,Hamap_ID,ProSiteProfiles_DESCR,CDD_ID,Hamap_DESCR,SMART_DESCR,PIRSF_ID,SFLD_DESCR,PIRSR_ID,SFLD_ID" --sortMem 209715200 \
+&& date
+```
+
+Added and tested in the app successfully!
+
+---------------------------------------
+## [2021-11-17] Re-adding the pfam track from a few days ago when the app broke (this time, adding to the protein refseq)
+
+Add as a track using flatfile to json:
+``` 
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/transcriptome/pfam.gff3 \
+--trackLabel "Pfam domain results" \
+--key "Pfam domain results" \
+--out data/Kappaphycus_alvarezii_transcriptome_protein \
+--nameAttributes "ID,Name" --sortMem 109715200 --maxLookback 100 \
+&& date
+```
+
+Tested in the app and it works successfully.
+
+---------------------------------------
+## [2021-11-17/18] Replacing Juans annotation track with new one from nov9th
+
+download all new files:
+``` 
+cd /large-store/annotations/juans-annotations/nov9th-version
+wget -O Kappaphycus_alvarezii_cdna_v2.fasta.gz https://www.dropbox.com/s/7s8cyn52uxmupe2/Kappaphycus_alvarezii_cdna_v2.fasta.gz?dl=1
+wget -O Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz https://www.dropbox.com/s/6smc8cf1450suxl/Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz?dl=0
+gunzip Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf.gz
+split -n l/6 Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf Kappaphycus_alvarezii_proteins_annot_seqs_v2.
+```
+The last cmd above splits the input file into 6 each parts using the correct prefix.
+Just need to rename all of these to .gtf for the script to recognise:
+
+```
+for f in `ls *_v2.a*`; do echo $f; mv $f ${f}.gtf; done; ls
+
+date && for f in `ls *_v2.a*gtf`; do python format-ips-gtf.py ${f}; done && date
+
+cat *v2.a*gff3 > Kappaphycus_alvarezii_proteins_annot_seqs_v2.all.formatted.gff3
+cat *v2.a*csv > Kappaphycus_alvarezii_proteins_annot_seqs_v2.all.all-db-names.csv
+
+wc -l Kappaphycus_alvarezii_proteins_annot_seqs_v2.all.formatted.gff3
+wc -l Kappaphycus_alvarezii_proteins_annot_seqs_v2.gtf
+```
+
+Then merge all dbs to get unique list (in python):
+```python
+from pathlib import Path
+p = Path('.').glob('*v2.a*csv') 
+all_data = []
+
+for csv in p:                                                                                                                                                                         
+    with open(csv, 'r') as in_file:                                                                                                                                                   
+        all = in_file.read()                                                                                                                                                      
+        all_data.append(all)
+
+all_data = ",".join(all_data)
+
+dbs = set()
+for db in all_data.split(","):
+    dbs.add(db)
+
+with open("Kappaphycus_alvarezii_proteins_annot_seqs_v2.all.all-db-names.csv.unique.csv", "w") as f:
+    result = ",".join([d for d in dbs if " " not in d])
+    print(result)
+    f.write(result)
+```
+
+The result of the above is:
+```
+'ProSiteProfiles_ID,PANTHER_ID,ProSitePatterns_DESCR,CDD_ID,ProSitePatterns_ID,TIGRFAM_ID,PANTHER_DESCR,Pfam_ID,ProSiteProfiles_DESCR,PIRSF_ID,TIGRFAM_DESCR,Gene3D_DESCR,PIRSF_DESCR,SUPERFAMILY_DESCR,SFLD_ID,SUPERFAMILY_ID,CDD_DESCR,SMART_DESCR,Hamap_ID,Hamap_DESCR,PRINTS_DESCR,SMART_ID,PRINTS_ID,Pfam_DESCR,SFLD_DESCR,Gene3D_ID'
+```
+
+Now we can add this file as a track:
+```
+cd /home/ec2-user/jbconnect/node_modules/@gmod/jbrowse/data/gff3
+ln -s /data/juans-annotations/nov9th-version/Kappaphycus_alvarezii_proteins_annot_seqs_v2.all.formatted.gff3 .
+cd ../..
+
+date && \
+./bin/flatfile-to-json.pl \
+--gff data/gff3/Ka_anno_v2_alias.gff3 \
+--trackLabel "Gene functional annotations v2" \
+--key "Gene functional annotations v2" \
+--out data/Kappaphycus_alvarezii \
+--nameAttributes "ID,Name,ProSiteProfiles_ID,PANTHER_ID,ProSitePatterns_DESCR,CDD_ID,ProSitePatterns_ID,TIGRFAM_ID,PANTHER_DESCR,Pfam_ID,ProSiteProfiles_DESCR,PIRSF_ID,TIGRFAM_DESCR,Gene3D_DESCR,PIRSF_DESCR,SUPERFAMILY_DESCR,SFLD_ID,SUPERFAMILY_ID,CDD_DESCR,SMART_DESCR,Hamap_ID,Hamap_DESCR,PRINTS_DESCR,SMART_ID,PRINTS_ID,Pfam_DESCR,SFLD_DESCR,Gene3D_ID" \
+--sortMem 109715200 --maxLookback 100 \
+&& date
+```
+
+The above crashed!!!
+
+So I tried to rename the file and rerun using the folloowing cmd:
+```
+date && \
+> ./bin/flatfile-to-json.pl \
+> --gff data/gff3/Ka_anno_v2_alias.gff3 \
+> --trackLabel "Gene functional annotations v2" \
+> --key "Gene functional annotations v2" \
+> --out data/Kappaphycus_alvarezii \
+> --nameAttributes "ID,Name,ProSiteProfiles_ID,PANTHER_ID,ProSitePatterns_DESCR,CDD_ID,ProSitePatterns_ID,TIGRFAM_ID,PANTHER_DESCR,Pfam_ID,ProSiteProfiles_DESCR,PIRSF_ID,TIGRFAM_DESCR,Gene3D_DESCR,PIRSF_DESCR,SUPERFAMILY_DESCR,SFLD_ID,SUPERFAMILY_ID,CDD_DESCR,SMART_DESCR,Hamap_ID,Hamap_DESCR,PRINTS_DESCR,SMART_ID,PRINTS_ID,Pfam_DESCR,SFLD_DESCR,Gene3D_ID" \
+> --sortMem 109715200 --maxLookback 100 \
+> ; date && echo "succuss"; date
+
+```
+
+
 
 ---------------------------------------------------------
 ---------------------------------------------------------
