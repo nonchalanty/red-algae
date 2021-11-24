@@ -44,7 +44,7 @@ To construct the blast db as follows:
 ```
 /data/davis--blast-dbs/ncbi-blast-2.12.0+/bin/makeblastdb -in UP000012073_2769.fasta -parse_seqids -blastdb_version 5 -title "chondrus_crispus_prot" -out output/chondrus_crispus_prot -taxid 2769 -dbtype prot
 ```
-Note, to perform taxid lookups aytomatically as part of the blast search is a two step process...
+Note, to perform taxid lookups automatically as part of the blast search is a two step process...
 This file needs to be downloaded in the same dir as your blast db:
 ftp://ftp.ncbi.nlm.nih.gov/blast/db/taxdb.tar.gz
 
