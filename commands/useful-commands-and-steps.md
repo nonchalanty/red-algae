@@ -1359,6 +1359,15 @@ exact instructions:
 ```
 https://linuxize.com/post/how-to-install-elasticsearch-on-centos-7/
 ```
+
+
+You can verify that Elasticsearch is running by sending an HTTP request to port 9200 on localhost with the following curl command :
+
+```
+curl -X GET "localhost:9200/"
+```
+
+
 ---------------------------------------------------------
 ---------------------------------------------------------
 # Random [IGNORE]
