@@ -1286,7 +1286,70 @@ date && \
 
 ```
 
+Turns out that we just needed to remove some bad concattenation which found its way into the gff3 file.
+We reomved and reloaded this together and now it works.
 
+
+--------------------------------
+## [21 Nov 2021] Try to install elastic search plugin
+
+```
+cd jbconnect/node_modules/@gmod/jbrowse/plugins/jbrowse_elasticsearch/
+```
+
+
+```
+(base) [ec2-user@ip-172-31-89-223 jbrowse_elasticsearch]$ cat setup.sh 
+#!/bin/bash
+set -eu -o pipefail
+
+echo "Installing Perl pre-requisites"
+
+# added by davis to run once off and then comentedout:
+cpan -i App::cpanminus
+#
+
+cpanm -v --notest Bio::Perl@1.7.2 < /dev/null;
+cpanm -v --notest Bio::Perl@1.7.2 < /dev/null;
+cpanm --notest .
+
+# line removed by Davis:
+#cpanm --notest https://github.com/GMOD/jbrowse/archive/master.tar.gz
+
+echo "Installing NodeJS pre-requisites"
+npm install
+
+echo "Setting up test dataset"
+# note: Davis added all the '../' path suffixes below
+../bin/prepare-refseqs.pl --fasta test/data/volvox.fa --out ../el_search_test/volvox
+../bin/flatfile-to-json.pl --gff test/data/volvox.gff3 --out ../el_search_test/volvox --type mRNA --trackLabel volvox_transcript --trackType CanvasFeatures --nameAttributes name,alias,id,description,note
+../bin/flatfile-to-json.pl --gff test/data/volvox.gff3 --out ../el_search_test/volvox --trackLabel volvox --trackType CanvasFeatures --nameAttributes name,alias,id,description,note
+cat test/data/volvox.conf > ../el_search_test/volvox/tracks.conf
+cp test/data/*gz* ../el_search_test/volvox
+
+echo "Done"
+(base) [ec2-user@ip-172-31-89-223 jbrowse_elasticsearch]$ cpanm Search::Elasticsearch
+--> Working on Search::Elasticsearch
+Fetching http://www.cpan.org/authors/id/E/EZ/EZIMUEL/Search-Elasticsearch-7.715.tar.gz ... OK
+Configuring Search-Elasticsearch-7.715 ... OK
+==> Found dependencies: Log::Any::Adapter::Callback, Net::IP, Sub::Exporter, Log::Any::Adapter, HTTP::Tiny, Test::Deep, Test::SharedFork, JSON::MaybeXS, Try::Tiny, Test::Exception, Devel::GlobalDestruction, Moo::Role, Log::Any, Module::Runtime, Test::Pod, Any::URI::Escape, Moo, Package::Stash, namespace::clean
+--> Working on Log::Any::Adapter::Callback
+Fetching http://www.cpan.org/authors/id/P/PE/PERLANCAR/Log-Any-Adapter-Callback-0.101.tar.gz ... OK
+Configuring Log-Any-Adapter-Callback-0.101 ... OK
+==> Found dependencies: Log::Any::Adapter
+--> Working
+```
+
+Run the modified instal script:
+
+```
+./setup.sh 
+```
+
+Then install elasticsearch 
+```
+cpanm Search::Elasticsearch
+```
 
 ---------------------------------------------------------
 ---------------------------------------------------------
