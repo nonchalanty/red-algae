@@ -1351,6 +1351,14 @@ Then install elasticsearch
 cpanm Search::Elasticsearch
 ```
 
+Fuck all of the above, just git cloned the repo again (after getting the perl 
+environment & all dependencies working) and followed the instructions and then the
+script runs. Also, needed to install elasticsearch tool . To do so, I followed these
+exact instructions:
+
+```
+https://linuxize.com/post/how-to-install-elasticsearch-on-centos-7/
+```
 ---------------------------------------------------------
 ---------------------------------------------------------
 # Random [IGNORE]
