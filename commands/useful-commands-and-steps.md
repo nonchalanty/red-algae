@@ -1360,6 +1360,41 @@ exact instructions:
 https://linuxize.com/post/how-to-install-elasticsearch-on-centos-7/
 ```
 
+Including adding the following:
+```
+sudo nano /usr/share/elasticsearch/bin/elasticsearch.in.sh
+JAVA_OPTS="$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError -Xm256m -Xmx256m"
+```
+
+And setting this env variable on the cli (but i dont think this makes a difference, so you can probably ignore it):
+```
+ES_JAVA_OPTS="-Xms256m -Xmx256m"
+```
+
+NB: change `/etc/elasticsearch/jvm.options` to have:
+``` 
+## for more information
+##
+################################################################
+
+# Xms represents the initial size of total heap space
+# Xmx represents the maximum size of total heap space
+
+-Xms256m
+-Xmx256m
+
+```
+
+Other config options are available in this directory:
+```
+/etc/elasticsearch/
+```
+
+And log files are here:
+```
+sudo ls /var/log/elasticsearch/
+```
+
 Start elastic search with:
 
 ```
@@ -1367,11 +1402,54 @@ sudo systemctl start elasticsearch.service
 ```
 
 You can verify that Elasticsearch is running by sending an HTTP request to port 9200 on localhost with the following curl command :
-
 ```
 curl -X GET "localhost:9200/"
 ```
 
+To troubleshoot why its not working, run this to help:
+```
+sudo systemctl status elasticsearch -l
+```
+
+Then, in a tmux session, leave the following server running:
+```
+cd /data/jbconnect/node_modules/@gmod/jbrowse/plugins/jbrowse_elasticsearch
+npm start
+```
+
+Finally, run the command from the plugin which generates the elasticsearch indexes:
+```
+./bin/generate-elastic-search.pl --out data/Kappaphycus_alvarezii_transcriptome_protein/ --genome kappaphycus_alvarezii_transcriptome_protein_idx
+```
+
+Note: the above will need to be run for every different reference sequence.
+
+Some errors you might get for low disk space 
+(note that it calculates disk space as a %, so beware that this might still happen even if 
+the disk has a lot of extra space):
+```
+Bulk error [index]: {"_index":"genekappaphycus_alvarezii_transcriptome_protein_idx","status":403,"_id":"XSgXVn0BebjFzT8artpa","error":{"reason":"blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];","type":"cluster_block_exception"},"_type":"loc"} at /home/ec2-user/perl5/lib/perl5/Search/Elasticsearch/Client/7_0/Role/Bulk.pm line 64, <$fh> line 4.
+Bulk error [index]: {"_index":"genekappaphycus_alvarezii_transcriptome_protein_idx","status":403,"_id":"XigXVn0BebjFzT8artpa","error":{"reason":"blocked by: [FORBIDDEN/12/index read-only / allow delete (api)];","type":"cluster_block_exception"},"_type":"loc"} at /home/ec2-user/perl5/lib/perl5/Search/Elasticsearch/Client/7_0/Role/Bulk.pm line 64, <$fh> line 4.
+Bulk error [index]: {"_index":"genekappaphycus_alvarezii_transcriptome_protein_idx","status":403,"_id":"XygXVn0BebjFzT8artpa","error":{"reason":"blocked by: [FORBIDDEN/12/index read-only / allow delete (api
+```
+
+Did the following to clear up disk space and get it working again:
+```
+mkdir /large-store/elasticsearch-indexes
+sudo mv /var/lib/elasticsearch/nodes /large-store/elasticsearch-indexes/nodes
+sudo ln -s /large-store/elasticsearch-indexes/nodes /var/lib/elasticsearch/nodes
+curl -XPUT -H "Content-Type: application/json" http://localhost:9200/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
+```
+
+```
+nano ~/perl5/lib/perl5/Search/Elasticsearch/Role/Cxn.pm
+
+    has 'request_timeout'       => ( is => 'ro', default  => 60 );
+
+    $e = Search::Elasticsearch->new(
+        request_timeout => 60
+    );
+```
 
 ---------------------------------------------------------
 ---------------------------------------------------------
